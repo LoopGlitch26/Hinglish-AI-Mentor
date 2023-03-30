@@ -3,7 +3,7 @@ from googletrans import Translator
 from indictrans import Transliterator
 import openai
 
-openai.api_key = ""
+openai.api_key = st.secrets["openai_api_key"]
 
 def chatbot_response(prompt):
     completions = openai.Completion.create(
