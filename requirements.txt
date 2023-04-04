@@ -4,4 +4,4 @@ git+https://github.com/libindic/indic-trans.git
 streamlit
 SpeechRecognition
 gTTS
-streamlit-webrtc
+streamlit-webrtc==0.31.0
