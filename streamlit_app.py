@@ -5,7 +5,7 @@ import openai
 import speech_recognition as sr
 from gtts import gTTS
 import tempfile
-from streamlit_webrtc import webrtc_streamer
+import streamlit_webrtc as webrtc
 
 openai.api_key = st.secrets["openai_api_key"]
 
@@ -25,16 +25,17 @@ def chatbot_response(prompt):
 def run_chatbot():
     # Get user audio input
     st.write("Speak your query:")
-    audio_input = webrtc_streamer(
+    audio_input = webrtc.Streamer(
+        audio=True, 
         key="audio-input",
-        audio=True,
-        desired_output_format=webrtc_streamer.OutputFormat.AUDIO,
-        height=0,
-        width=0,
-        streaming_time_limit=7000,  # 7000 milliseconds
-        throttling_refresh_rate=1,
+        constraints={"audio": True},
     )
-    user_audio = st.audio(audio_input, format="audio/wav")
+    audio_input.start()
+    user_audio = st.video(
+        audio_input,
+        format="audio",
+        start_time=0,
+    )
 
     # Convert user audio input to Hindi text
     st.write("Converting audio to text...")
