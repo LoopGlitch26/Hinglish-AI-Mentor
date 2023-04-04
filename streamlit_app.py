@@ -2,6 +2,9 @@ import streamlit as st
 from googletrans import Translator
 from indictrans import Transliterator
 import openai
+import speech_recognition as sr
+from gtts import gTTS
+import streamlit_webrtc as webrtc
 
 openai.api_key = st.secrets["openai_api_key"]
 
@@ -18,8 +21,12 @@ def chatbot_response(prompt):
     message = completions.choices[0].text
     return message
 
-def run_chatbot():
-    user_input = st.text_input("Enter your query in Hinglish:")
+def run_chatbot(audio_input):
+    # Convert speech to text
+    recognizer = sr.Recognizer()
+    with sr.AudioFile(audio_input) as source:
+        audio_text = recognizer.record(source)
+    user_input = recognizer.recognize_google(audio_text)
 
     if user_input:
         try:
@@ -38,12 +45,21 @@ def run_chatbot():
             # Convert Hindi response to Hinglish
             hinglish_response = Transliterator(source='hin', target='eng').transform(hindi_response)
 
-            # Output Hinglish response
-            st.success(f"Chatbot (Hinglish): {hinglish_response}")
+            # Output Hinglish response in audio format
+            tts = gTTS(hinglish_response)
+            tts.save('response.mp3')
+            st.audio('response.mp3', format='audio/mp3')
         except Exception as e:
             st.error("Error: " + str(e))
 
 if __name__ == "__main__":
     st.set_page_config(page_title="Hinglish Chatbot")
     st.title("Hinglish Chatbot")
-    run_chatbot()
+
+    # Create WebRTC audio input
+    webrtc_ctx = webrtc.StreamlitWebRTC(audio=True, key="audio-input")
+    audio_input = webrtc_ctx.audio_receiver()
+
+    # Run the chatbot
+    if st.button("Start Chatbot"):
+        run_chatbot(audio_input)
