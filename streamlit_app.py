@@ -2,9 +2,11 @@ import streamlit as st
 from googletrans import Translator
 from indictrans import Transliterator
 import openai
-import speech_recognition as sr
-from gtts import gTTS
-import streamlit_webrtc as webrtc
+import sounddevice as sd
+import tempfile
+import os
+from pydub import AudioSegment
+from pydub.playback import play
 
 openai.api_key = st.secrets["openai_api_key"]
 
@@ -21,10 +23,20 @@ def chatbot_response(prompt):
     message = completions.choices[0].text
     return message
 
-def run_chatbot(audio_input):
+def run_chatbot(frames, sample_rate):
+    # Save audio input to a temporary file
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
+        filename = f.name
+        AudioSegment(
+            data=frames,
+            sample_width=2,
+            frame_rate=sample_rate,
+            channels=1
+        ).export(out_f=f, format="wav")
+
     # Convert speech to text
     recognizer = sr.Recognizer()
-    with sr.AudioFile(audio_input) as source:
+    with sr.AudioFile(filename) as source:
         audio_text = recognizer.record(source)
     user_input = recognizer.recognize_google(audio_text)
 
@@ -47,8 +59,11 @@ def run_chatbot(audio_input):
 
             # Output Hinglish response in audio format
             tts = gTTS(hinglish_response)
-            tts.save('response.mp3')
-            st.audio('response.mp3', format='audio/mp3')
+            with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
+                filename = f.name
+                tts.save(filename)
+                play(AudioSegment.from_mp3(filename))
+            os.unlink(filename)
         except Exception as e:
             st.error("Error: " + str(e))
 
@@ -56,10 +71,11 @@ if __name__ == "__main__":
     st.set_page_config(page_title="Hinglish Chatbot")
     st.title("Hinglish Chatbot")
 
-    # Create WebRTC audio input
-    webrtc_ctx = webrtc.StreamlitWebRTC(audio=True, key="audio-input")
-    audio_input = webrtc_ctx.audio_receiver()
-
-    # Run the chatbot
-    if st.button("Start Chatbot"):
-        run_chatbot(audio_input)
+    # Create audio input
+    def audio_callback(frames, sample_rate):
+        run_chatbot(frames, sample_rate)
+    sd.default.samplerate = 44100
+    sd.default.channels = 1
+    with sd.InputStream(callback=audio_callback):
+        st.text("Say something...") # Display a text prompt
+        st.pause() # Pause the script until user stops the audio input
