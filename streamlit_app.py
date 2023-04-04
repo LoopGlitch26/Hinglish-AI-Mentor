@@ -24,18 +24,19 @@ def chatbot_response(prompt):
 
 def run_chatbot():
     try:
-        # Define audio input and output
-        audio_input = webrtc.AudioProcessor(
-            device=webrtc.audio_devices.get_default_input_device_info()["name"]
-        )
-        audio_output = webrtc.AudioProcessor(
-            device=webrtc.audio_devices.get_default_output_device_info()["name"]
-        )
-
         # Get user audio input
         st.write("Speak your query:")
-        audio_input_frames = audio_input.record(num_frames=1024)
-        user_audio = audio_input_frames.to_ndarray()
+        audio_input = webrtc.Streamer(
+            audio=True, 
+            key="audio-input",
+            constraints={"audio": True},
+        )
+        audio_input.start()
+        user_audio = st.video(
+            audio_input,
+            format="audio",
+            start_time=0,
+        )
 
         # Convert user audio input to Hindi text
         st.write("Converting audio to text...")
@@ -73,10 +74,10 @@ def run_chatbot():
 
         # Output chatbot audio response
         st.write("Chatbot Response:")
-        with open(audio_file, 'rb') as af:
-            audio_output.play(af.read())
+        st.audio(audio_file)
+
     except Exception as e:
-        st.error(f"Error: {e}")
+        st.error(f"Error occurred: {e}")
 
 if __name__ == "__main__":
     st.set_page_config(page_title="Hindi Chatbot")
