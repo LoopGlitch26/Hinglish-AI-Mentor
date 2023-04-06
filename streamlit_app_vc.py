@@ -23,11 +23,14 @@ def main():
     st.title("Hinglish Chatbot")
 
     # Add a default prompt to the chatbox
-    st.sidebar.write("Answer in Hinglish language")
-    user_input = st.text_input("You:")
+    openai_prompt = "Answer in Hinglish language"
+
+    # Take user input and get response
+    user_input = st.text_input("You:", key="input")
     if user_input:
-        response = chatbot_response(user_input)
-        st.write("Chatbot:", response)
+        prompt = openai_prompt + "\nYou: " + user_input + "\nChatbot:"
+        response = chatbot_response(prompt)
+        st.write(response)
 
 if __name__ == "__main__":
     main()
