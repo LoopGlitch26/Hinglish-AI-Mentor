@@ -37,9 +37,6 @@ def main():
     business_description = st.text_area("Business description")
     target_customers = st.text_area("Target customers")
 
-    # Use OpenAI to act as a mentor based on the provided details
-    st.write("Welcome to the mentorship program for your business, " + business_name + "!")
-
     # Initialize the chat history
     chat_history = []
     
@@ -56,9 +53,9 @@ def main():
             # Store the conversation in the chat history
             chat_history.append(("Microentrepreneur: " + question, "Mentor: " + response))
 
-        # Display chat history
-        st.write("Chat History:")
-        if question:
+        # Display chat history only if the conversation has started
+        if chat_history:
+            st.write("Chat History:")
             for chat in chat_history:
                 st.write(chat[0])
                 st.write(chat[1])
