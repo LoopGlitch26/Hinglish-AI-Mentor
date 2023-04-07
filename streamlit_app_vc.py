@@ -55,9 +55,10 @@ def main():
 
         # Display chat history
         st.write("Chat History:")
-        for chat in chat_history:
-            st.write(chat[0])
-            st.write(chat[1])
+        if response:
+            for chat in chat_history:
+                st.write(chat[0])
+                st.write(chat[1])
             
 if __name__ == "__main__":
     main()
