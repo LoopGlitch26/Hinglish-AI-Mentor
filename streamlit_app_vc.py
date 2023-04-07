@@ -39,6 +39,7 @@ def main():
 
     # Initialize the chat history
     chat_history = []
+    counter = 1
     
     while True:
         # Ask the user a question in Hinglish and get the mentor's response in Hinglish
@@ -51,7 +52,8 @@ def main():
             st.success("Mentor: " + response)
 
             # Store the conversation in the chat history
-            chat_history.append(("Microentrepreneur: " + question, "Mentor: " + response))
+            chat_history.append((counter, "Microentrepreneur: " + question, "Mentor: " + response))
+            counter += 1
 
         # Display chat history only if the conversation has started
         if chat_history:
