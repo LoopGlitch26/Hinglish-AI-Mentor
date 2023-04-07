@@ -55,22 +55,12 @@ def main():
         # Store the conversation in the chat history
         chat_history.append(("Microentrepreneur: " + question, "Mentor: " + response))
 
-        # Allow the user to respond to the mentor's advice
-        while True:
-            user_input = st.text_input("Aap kya kehna chahte hain?")
-            if user_input:
-                response = chatbot_response(user_input)
-                st.write("Mentor: " + response)
-
-                # Store the conversation in the chat history
-                chat_history.append(("Microentrepreneur: " + user_input, "Mentor: " + response))
-
-                # Display chat history
-                st.write("Chat History:")
-                for chat in chat_history:
-                    st.write(chat[0])
-                    st.write(chat[1])
-                break
-
+        # Display chat history
+        st.write("Chat History:")
+        for chat in chat_history:
+            st.write(chat[0])
+            st.write(chat[1])
+            
+            
 if __name__ == "__main__":
     main()
