@@ -18,49 +18,19 @@ def chatbot_response(prompt):
     message = completions.choices[0].text
     return message
 
-# Define the Streamlit app
+# Main function
 def main():
     st.title("Hinglish Chatbot")
-        
-    # Prompt the user to select their business type
-    st.write("Please select your business type:")
-    business_type_options = ("Kirana shop", "Mobile repair shop", "Beauty salon", "Food truck", "Others")
-    business_type = st.selectbox("", business_type_options)
 
-    if business_type == "Others":
-        # Prompt the user to input their business type
-        business_type = st.text_input("Please enter your business type:")
+    # Add a default prompt to the chatbox
+    openai_prompt = "Answer in Hinglish language"
 
-    # Prompt the user to input their business details in Hinglish
-    st.write("Please provide some details about your business in Hinglish:")
-    business_name = st.text_input("Business name")
-    business_description = st.text_area("Business description")
-    target_customers = st.text_area("Target customers")
+    # Take user input and get response
+    user_input = st.text_input("You:", key="input")
+    if user_input:
+        prompt = openai_prompt + "\nYou: " + user_input + "\nChatbot:"
+        response = chatbot_response(prompt)
+        st.write(response)
 
-    # Initialize the chat history
-    chat_history = []
-    counter = 1
-    
-    while True:
-        # Ask the user a question in Hinglish and get the mentor's response in Hinglish
-        question = st.text_input("Aap kya puchna chahte hain?")
-        if question:
-            prompt = "Hinglish mein jawaab dein: " + business_description + " " + target_customers + " " + question
-            response = chatbot_response(prompt)
-
-            # Display the mentor's response in Hinglish
-            st.success("Mentor: " + response)
-
-            # Store the conversation in the chat history
-            chat_history.append((counter, "Microentrepreneur: " + question, "Mentor: " + response))
-            counter += 1
-
-        # Display chat history only if the conversation has started
-        if chat_history:
-            st.write("Chat History:")
-            for chat in chat_history:
-                st.write(chat[0])
-                st.write(chat[1])
-            
 if __name__ == "__main__":
     main()
