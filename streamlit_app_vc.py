@@ -39,25 +39,25 @@ def main():
 
     # Use OpenAI to act as a mentor based on the provided details
     st.write("Welcome to the mentorship program for your business, " + business_name + "!")
+    
+    while True:
+        # Ask the user a question in Hinglish and get the mentor's response in Hinglish
+        question = st.text_input("Aap kya puchna chahte hain?")
+        if question:
+            prompt = "Hinglish mein jawaab dein: " + business_description + " " + target_customers + " " + question
+            response = chatbot_response(prompt)
 
-while True:
-    # Ask the user a question in Hinglish and get the mentor's response in Hinglish
-    question = st.text_input("Aap kya puchna chahte hain?")
-    if question:
-        prompt = "Hinglish mein jawaab dein: " + business_description + " " + target_customers + " " + question
-        response = chatbot_response(prompt)
+            # Display the mentor's response in Hinglish
+            st.success("Mentor: " + response)
 
-        # Display the mentor's response in Hinglish
-        st.success("Mentor: " + response)
+            # Store the conversation in the chat history
+            chat_history.append(("Microentrepreneur: " + question, "Mentor: " + response))
 
-        # Store the conversation in the chat history
-        chat_history.append(("Microentrepreneur: " + question, "Mentor: " + response))
-
-    # Display chat history
-    st.write("Chat History:")
-    for chat in chat_history:
-        st.write(chat[0])
-        st.write(chat[1])
+        # Display chat history
+        st.write("Chat History:")
+        for chat in chat_history:
+            st.write(chat[0])
+            st.write(chat[1])
             
 if __name__ == "__main__":
     main()
