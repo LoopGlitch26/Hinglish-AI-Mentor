@@ -39,6 +39,9 @@ def main():
 
     # Use OpenAI to act as a mentor based on the provided details
     st.write("Welcome to the mentorship program for your business, " + business_name + "!")
+
+    # Initialize the chat history
+    chat_history = []
     
     while True:
         # Ask the user a question in Hinglish and get the mentor's response in Hinglish
