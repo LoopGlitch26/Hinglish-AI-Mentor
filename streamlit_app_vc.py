@@ -39,21 +39,21 @@ def main():
 
     # Use OpenAI to act as a mentor based on the provided details
     st.write("Welcome to the mentorship program for your business, " + business_name + "!")
-    st.write("Here are some tips and advice based on the information you provided:")
+    # st.write("Here are some tips and advice based on the information you provided:")
 
     # Ask the user if they would like to continue
-    st.write("Kya aap jaari rakhna chahte hain?")
-    ready = st.radio("", ("Haan", "Nahi"))
+    # st.write("Kya aap jaari rakhna chahte hain?")
+    # ready = st.radio("", ("Haan", "Nahi"))
 
     # If the user is ready, start the mentorship session
-    if ready == "Haan":
+    while True:
         # Ask the user a question in Hinglish and get the mentor's response in Hinglish
         question = st.text_input("Aap kya puchna chahte hain?")
         prompt = "Hinglish mein jawaab dein: " + business_description + " " + target_customers + " " + question
         response = chatbot_response(prompt)
 
         # Display the mentor's response in Hinglish
-        st.write("Mentor: " + response)
+        st.success("Mentor: " + response)
 
         # Allow the user to respond to the mentor's advice
         while True:
