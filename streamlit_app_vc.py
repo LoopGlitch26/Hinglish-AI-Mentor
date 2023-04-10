@@ -22,7 +22,7 @@ def chatbot_response(prompt):
 def text_to_speech(text, speed=1.5):
     audio_bytes = BytesIO()
     tts = gTTS(text=text, lang="hi", slow=False)
-    for idx, segment in enumerate(tts.audio._segments):
+    for idx, segment in enumerate(tts._segments):
         new_duration = round(segment.duration * (1/speed), 3)
         segment._data = segment._spawn(segment._data, overrides={'frame_rate': int(tts.frame_rate/speed)})
         segment._duration = new_duration
