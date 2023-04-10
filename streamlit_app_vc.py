@@ -26,7 +26,7 @@ def text_to_speech(text):
     tts.write_to_fp(audio_bytes)
     audio_bytes.seek(0)
     audio = AudioSegment.from_file(audio_bytes, format='mp3')
-    audio = audio.speedup(playback_speed=2.0)    
+    audio = audio.speedup(playback_speed=2.5)    
     modified_audio = BytesIO()
     audio.export(modified_audio, format='mp3')
     modified_audio.seek(0)
