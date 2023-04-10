@@ -8,3 +8,4 @@ pyttsx3
 gTTS==2.3.1
 pydub
 ffmpeg
+soundfile
