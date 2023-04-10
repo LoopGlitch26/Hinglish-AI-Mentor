@@ -1,10 +1,10 @@
 import streamlit as st
+from googletrans import Translator
+from indictrans import Transliterator
 import openai
 
-# Initialize the OpenAI API key
 openai.api_key = st.secrets["openai_api_key"]
 
-# Define a function to handle the chatbot response
 def chatbot_response(prompt):
     completions = openai.Completion.create(
         engine="text-davinci-003",
@@ -16,21 +16,23 @@ def chatbot_response(prompt):
     )
 
     message = completions.choices[0].text
-    return message
+    return message    
+    
+def run_chatbot():    
+    default_prompt = "Answer in Hinglish language."    
+    user_input = st.text_input("Enter your query in Hinglish:")
 
-# Main function
-def main():
-    st.title("Hinglish Chatbot")
-
-    # Add a default prompt to the chatbox
-    openai_prompt = "Answer in Hinglish language"
-
-    # Take user input and get response
-    user_input = st.text_input("You:", key="input")
     if user_input:
-        prompt = openai_prompt + "\nYou: " + user_input + "\nChatbot:"
-        response = chatbot_response(prompt)
-        st.write(response)
+        try:
+            hindi_text = Transliterator(source='eng', target='hin').transform(user_input)
+            english_text = Translator().translate(hindi_text, dest='en').text
+            prompt = default_prompt + "\nYou: " + english_text      
+            response = chatbot_response(prompt)
+            st.success(f"Chatbot: {response}")
+        except Exception as e:
+            st.error("Error: " + str(e))
 
 if __name__ == "__main__":
-    main()
+    st.set_page_config(page_title="Hinglish Chatbot")
+    st.title("Hinglish Chatbot")
+    run_chatbot()    
