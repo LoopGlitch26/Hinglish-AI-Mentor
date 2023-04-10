@@ -20,7 +20,7 @@ def chatbot_response(prompt):
     return message
    
 def text_to_speech(text):
-    text = '    '.join(text.split())   
+    text = '                    '.join(text.split())   
     audio_bytes = BytesIO()
     tts = gTTS(text=text, lang="hi")
     tts.write_to_fp(audio_bytes)
