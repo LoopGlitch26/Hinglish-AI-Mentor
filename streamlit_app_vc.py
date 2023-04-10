@@ -18,7 +18,7 @@ def chatbot_response(prompt):
     return message    
     
 def run_chatbot():    
-    default_prompt = "Answer in details in Hinglish language."
+    default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke sath baat kar rhe hai, jisko aap Mentorship de rhe hai."
     user_input = st.text_input("Enter your query in Hinglish:")
 
     if user_input:
