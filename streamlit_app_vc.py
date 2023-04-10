@@ -19,7 +19,7 @@ def chatbot_response(prompt):
     return message    
     
 def run_chatbot():    
-    default_prompt = "Answer in Hinglish language."    
+    default_prompt = "Give results in Hinglish language."    
     user_input = st.text_input("Enter your query in Hinglish:")
 
     if user_input:
