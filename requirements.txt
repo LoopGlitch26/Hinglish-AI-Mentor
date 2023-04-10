@@ -3,3 +3,5 @@ googletrans==4.0.0-rc1
 git+https://github.com/libindic/indic-trans.git
 streamlit
 azure-cognitiveservices-speech
+speechrecognition
+pyttsx3
