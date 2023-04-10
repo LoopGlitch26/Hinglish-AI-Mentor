@@ -16,7 +16,6 @@ def chatbot_response(prompt):
         top_p=0.9,
         frequency_penalty=0.5,
         presence_penalty=0.5,
-        output_language="hi-IN",
     )
     message = completions.choices[0].text
     return message    
@@ -25,7 +24,7 @@ def run_chatbot():
     default_prompt = """
     Hinglish Mentor Chatbot:
     Please provide your query in Hinglish language.
-    I will try my best to guide you like a mentor and provide helpful insights to your query.
+    I will try my best to answer you in Hinglish language and guide you like a mentor to provide helpful insights regarding your query.
     Your query:
     """
 
