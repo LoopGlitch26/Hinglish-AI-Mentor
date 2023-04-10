@@ -9,17 +9,26 @@ def chatbot_response(prompt):
     completions = openai.Completion.create(
         engine="text-davinci-003",
         prompt=prompt,
-        max_tokens=1024,
+        max_tokens=2048,
         n=1,
         stop=None,
-        temperature=0.5,
+        temperature=0.8,
+        top_p=0.9,
+        frequency_penalty=0.5,
+        presence_penalty=0.5,
+        output_language="hi-IN",
     )
-
     message = completions.choices[0].text
     return message    
     
 def run_chatbot():    
-    default_prompt = "Give results in Hinglish language."    
+    default_prompt = """
+    Hinglish Mentor Chatbot:
+    Please provide your query in Hinglish language.
+    I will try my best to guide you like a mentor and provide helpful insights to your query.
+    Your query:
+    """
+
     user_input = st.text_input("Enter your query in Hinglish:")
 
     if user_input:
