@@ -4,6 +4,7 @@ from indictrans import Transliterator
 import openai
 from gtts import gTTS
 from io import BytesIO
+from pydub import AudioSegment
 
 openai.api_key = st.secrets["openai_api_key"]
 
