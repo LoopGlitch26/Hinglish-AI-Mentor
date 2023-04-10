@@ -5,3 +5,4 @@ streamlit
 azure-cognitiveservices-speech
 speechrecognition
 pyttsx3
+gTTS==2.3.1
