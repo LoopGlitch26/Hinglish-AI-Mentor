@@ -1,12 +1,10 @@
-
- 
-
 import streamlit as st
 from googletrans import Translator
 from indictrans import Transliterator
 import openai
 from gtts import gTTS
 from io import BytesIO
+import pydub
 
 openai.api_key = st.secrets["openai_api_key"]
 
@@ -21,14 +19,19 @@ def chatbot_response(prompt):
     )
     message = completions.choices[0].text
     return message
-
-def text_to_speech(text):
+   
+def text_to_speech(text, speed=1.5):
     audio_bytes = BytesIO()
     tts = gTTS(text=text, lang="hi", slow=False)
     tts.write_to_fp(audio_bytes)
     audio_bytes.seek(0)
-    return audio_bytes.read()
-
+    sound = pydub.AudioSegment.from_file(audio_bytes, format="mp3")
+    sound = sound.speedup(playback_speed=speed)
+    output_bytes = BytesIO()
+    sound.export(output_bytes, format="wav")
+    output_bytes.seek(0)
+    return output_bytes.read()
+   
 def run_chatbot():    
     default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:"
     user_input = st.text_input("Enter your query in Hinglish:")
