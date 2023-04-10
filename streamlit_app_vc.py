@@ -4,7 +4,6 @@ from indictrans import Transliterator
 import openai
 from gtts import gTTS
 from io import BytesIO
-from pydub import AudioSegment
 
 openai.api_key = st.secrets["openai_api_key"]
 
@@ -23,7 +22,7 @@ def chatbot_response(prompt):
 def text_to_speech(text, speed=1.5):
     audio_bytes = BytesIO()
     tts = gTTS(text=text, lang="hi", slow=False)
-    for idx, segment in enumerate(tts.audio.segments):
+    for idx, segment in enumerate(tts.audio._segments):
         new_duration = round(segment.duration * (1/speed), 3)
         segment._data = segment._spawn(segment._data, overrides={'frame_rate': int(tts.frame_rate/speed)})
         segment._duration = new_duration
@@ -38,9 +37,6 @@ def text_to_speech(text, speed=1.5):
 def run_chatbot():    
     default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:"
     user_input = st.text_input("Enter your query in Hinglish:")
-    speed_options = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
-    default_speed = 1.5
-    speed = st.selectbox("Select the playback speed", options=speed_options, index=speed_options.index(default_speed))
     if user_input:
         try:
             hindi_text = Transliterator(source='eng', target='hin').transform(user_input)
