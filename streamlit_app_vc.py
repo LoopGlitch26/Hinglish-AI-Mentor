@@ -4,6 +4,7 @@ from indictrans import Transliterator
 import openai
 from gtts import gTTS
 from io import BytesIO
+from pydub import AudioSegment
 
 openai.api_key = st.secrets["openai_api_key"]
 
@@ -24,8 +25,13 @@ def text_to_speech(text):
     tts = gTTS(text=text, lang="hi")
     tts.write_to_fp(audio_bytes)
     audio_bytes.seek(0)
-    return audio_bytes.read()
-
+    audio = AudioSegment.from_file(audio_bytes, format='mp3')
+    audio = audio.speedup(playback_speed=1.5)    
+    modified_audio = BytesIO()
+    audio.export(modified_audio, format='mp3')
+    modified_audio.seek(0)
+    
+    return modified_audio.read()
 def run_chatbot():    
     default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:"
     user_input = st.text_input("Enter your query in Hinglish:")
