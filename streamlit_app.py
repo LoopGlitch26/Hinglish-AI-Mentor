@@ -15,6 +15,7 @@ from scipy.io.wavfile import write
 import wavio as wv
 import whisper
 import numpy as np
+import soundfile as sf
 
 def main():
     openai.api_key = st.secrets["openai_api_key"]
@@ -46,6 +47,13 @@ def main():
                     myobj = gTTS(text=res,lang='hi', slow=False)
                     mp3_play=BytesIO()
                     myobj.write_to_fp(mp3_play)
+                    
+                    audio_data, sample_rate = sf.read(mp3_play)                    
+                    audio_data_new = np.interp(np.arange(0, len(audio_data), int(sample_rate*1.33)), np.arange(0, len(audio_data)), audio_data)                    
+                    mp3_play_new = BytesIO()
+                    sf.write(mp3_play_new, audio_data_new, sample_rate)
+                    mp3_play_new.seek(0)
+                    
                     st.audio(mp3_play,format="audio/mp3", start_time=0)
                     st.success(res)
                 except Exception as e:
@@ -83,6 +91,13 @@ def main():
                 myobj = gTTS(text=res,lang='hi', slow=False)
                 mp3_play=BytesIO()
                 myobj.write_to_fp(mp3_play)
+                
+                audio_data, sample_rate = sf.read(mp3_play)                    
+                audio_data_new = np.interp(np.arange(0, len(audio_data), int(sample_rate*1.33)), np.arange(0, len(audio_data)), audio_data)                    
+                mp3_play_new = BytesIO()
+                sf.write(mp3_play_new, audio_data_new, sample_rate)
+                mp3_play_new.seek(0)
+                
                 st.audio(mp3_play,format="audio/mp3", start_time=0)
                 st.success(res)
             except Exception as e:
