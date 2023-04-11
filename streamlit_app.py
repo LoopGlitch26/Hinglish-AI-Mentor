@@ -28,7 +28,7 @@ def main():
     form = st.form(key="user_settings")
     if inp=="Text":
         with form:
-            kw = st.text_input("",placeholder="Enter your query",key = "en_keyword")
+            kw = st.text_input("Enter your query in Hinglish:", key="en_keyword", placeholder="Type here...")
             submit = form.form_submit_button("Get advice")
             if submit:
                 try:
@@ -46,8 +46,7 @@ def main():
                     myobj = gTTS(text=res,lang='hi', slow=False)
                     mp3_play=BytesIO()
                     myobj.write_to_fp(mp3_play)
-                    playback_rate = st.slider("Playback speed", min_value=0.5, max_value=2.0, value=1.5, step=0.1)
-                    st.audio(mp3_play,format="audio/mp3", start_time=0, playback_rate=playback_rate)
+                    st.audio(mp3_play,format="audio/mp3", start_time=0)
                     st.success(res)
                 except Exception as e:
                     st.error("Error: " + str(e))
@@ -79,8 +78,7 @@ def main():
                 myobj = gTTS(text=res,lang='hi', slow=False)
                 mp3_play=BytesIO()
                 myobj.write_to_fp(mp3_play)
-                playback_rate = st.slider("Playback speed", min_value=0.5, max_value=2.0, value=1.5, step=0.1)
-                st.audio(mp3_play,format="audio/mp3", start_time=0, playback_rate=playback_rate)
+                st.audio(mp3_play,format="audio/mp3", start_time=0)
                 st.success(res)
             except Exception as e:
                 st.error("Error: " + str(e))       
