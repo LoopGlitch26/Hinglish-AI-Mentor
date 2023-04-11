@@ -60,9 +60,13 @@ def main():
             wav_audio_data = st_audiorec()
             time.sleep(10)
             if wav_audio_data is not None:
-                text = Transliterator(source='hin', target='hin').transform(model.transcribe(st.audio(wav_audio_data, format='audio/wav')))
-                print("Recorded audio query:", text)
-
+                try:
+                    text = model.transcribe(wav_audio_data)
+                except Exception as e:
+                    st.warning("An error occurred while processing your query: {}".format(str(e)))
+            else:
+                st.warning("No audio data was recorded")
+      
         submit = st.button("Get advice")
         if submit:
             try:
