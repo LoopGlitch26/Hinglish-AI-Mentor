@@ -1,5 +1,7 @@
 import os
 import openai
+from googletrans import Translator
+from indictrans import Transliterator
 import time
 from io import BytesIO
 from gtts import gTTS
