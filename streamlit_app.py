@@ -15,7 +15,7 @@ import whisper
 import numpy as np
 
 def main():
-    openai.api_key = st.secrets['OPEN_AI_KEY']
+    openai.api_key = st.secrets["openai_api_key"]
     st.set_page_config(layout="centered")
     title='<p style="font-family:Algerian; color:Red; align:center; font-size: 42px;">MicroMentor<p>'
     st.markdown(title,unsafe_allow_html=True)
