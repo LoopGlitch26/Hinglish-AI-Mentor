@@ -47,7 +47,7 @@ def main():
                     myobj.write_to_fp(mp3_play)
                     st.audio(mp3_play,format="audio/mp3", start_time=0)
                     st.markdown(f"Here's some advice for your query:")
-                    st.write(res)
+                    st.success(res)
                 except Exception as e:
                     st.error("Error: " + str(e))
                 
@@ -80,10 +80,12 @@ def main():
                 myobj.write_to_fp(mp3_play)
                 st.audio(mp3_play,format="audio/mp3", start_time=0)
                 st.markdown(f"Here's some advice for your query:")
-                st.write(res)
+                st.success(res)
             except Exception as e:
-                st.error("Error: " + str(e))        
-    
+                st.error("Error: " + str(e))       
+                
+    footer = '<p style=\'text-align: center; font-size: 0.8em;\'>Copyright © 2023 LoopGlitch26</p>'
+    st.markdown(footer, unsafe_allow_html=True)        
         
 if __name__ == "__main__":
     st.set_page_config(page_title="Hinglish Chatbot")
@@ -93,5 +95,3 @@ if __name__ == "__main__":
         sys.argv = ["streamlit", "run", sys.argv[0]]
         sys.exit(stcli.main())
 
-footer = '<p style=\'text-align: center; font-size: 0.8em;\'>Copyright © 2023 LoopGlitch26</p>'
-st.markdown(footer, unsafe_allow_html=True)        
