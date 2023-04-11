@@ -13,3 +13,4 @@ streamlit_webrtc
 wavio
 scipy
 whisper
+streamlit-player==0.1.5
