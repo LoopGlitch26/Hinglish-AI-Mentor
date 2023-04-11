@@ -7,6 +7,7 @@ from io import BytesIO
 from gtts import gTTS
 from streamlit.web import cli as stcli
 from streamlit import runtime
+from streamlit import set_theme
 import streamlit as st
 from dotenv import load_dotenv
 import streamlit.components.v1 as components
