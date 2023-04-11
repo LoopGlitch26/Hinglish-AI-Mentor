@@ -54,13 +54,14 @@ def main():
     else :
         model=whisper.load_model("base")
         rec=st.button("Record your query")
-        st.markdown("Please don't use the stop button, it terminates the process abruptly\nWait for the 'get advice' button to appear and click it")
+        st.markdown("Please don't use the stop button, it terminates the process abruptly.\nWait for the 'get advice' button to appear and click it")
         text=""
         if rec:
             wav_audio_data = st_audiorec()
             time.sleep(10)
             if wav_audio_data is not None:
-                text = Transliterator(source='eng', target='hin').transform(model.transcribe(st.audio(wav_audio_data, format='audio/wav')))
+                text = Transliterator(source='hin', target='hin').transform(model.transcribe(st.audio(wav_audio_data, format='audio/wav')))
+                print("Recorded audio query:", text)
 
         submit = st.button("Get advice")
         if submit:
