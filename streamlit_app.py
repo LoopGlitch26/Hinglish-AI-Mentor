@@ -18,7 +18,7 @@ import numpy as np
 
 def main():
     openai.api_key = st.secrets["openai_api_key"]
-    st.set_page_config(layout="centered")
+    st.set_page_config(layout="wide")
     title='<p style="font-family:Algerian; color:Cyan; align:center; font-size: 42px;">Hinglish AI ChatBot<p>'
     st.markdown(title,unsafe_allow_html=True)
     st.markdown("Hi, I'm MicroMentor, powered by AI.\nI'm here to help you with your micro-entrepreneurial issues.\nI can provide you with business tips and advice based on your business concerns.\nI can listen to you and I can also read your queries.\nSo, let's get started.")
@@ -67,12 +67,12 @@ def main():
             try:
                 english_text = Translator().translate(text, dest='en').text
                 response = openai.Completion.create(
-                    engine="text-davinci-002", 
+                    engine="text-davinci-003", 
                     prompt="Here's some advice for your query: " + english_text + "\nAdvice:",
-                    max_tokens=50,
+                    max_tokens=1024,
                     n = 1,
                     stop=None,
-                    temperature=0.7,
+                    temperature=0.8,
                 )
                 res=response.choices[0].text
                 myobj = gTTS(text=res,lang='hi', slow=False)
