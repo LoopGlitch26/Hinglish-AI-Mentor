@@ -36,7 +36,7 @@ def main():
                     english_text = Translator().translate(hindi_text, dest='en').text
                     response = openai.Completion.create(
                         engine="text-davinci-003", 
-                        prompt="Here's some advice for your query: " + english_text + "\n" + default_prompt,
+                        prompt=default_prompt + "\n" + english_text,
                         max_tokens=1024,
                         n = 1,
                         stop=None,
@@ -47,7 +47,6 @@ def main():
                     mp3_play=BytesIO()
                     myobj.write_to_fp(mp3_play)
                     st.audio(mp3_play,format="audio/mp3", start_time=0)
-                    st.markdown(f"Here's some advice for your query:")
                     st.success(res)
                 except Exception as e:
                     st.error("Error: " + str(e))
@@ -69,7 +68,7 @@ def main():
                 english_text = Translator().translate(text, dest='en').text
                 response = openai.Completion.create(
                     engine="text-davinci-003", 
-                    prompt="Here's some advice for your query: " + english_text + "\n" + default_prompt,
+                    prompt=default_prompt + "\n" + english_text,
                     max_tokens=1024,
                     n = 1,
                     stop=None,
@@ -80,12 +79,11 @@ def main():
                 mp3_play=BytesIO()
                 myobj.write_to_fp(mp3_play)
                 st.audio(mp3_play,format="audio/mp3", start_time=0)
-                st.markdown(f"Here's some advice for your query:")
                 st.success(res)
             except Exception as e:
                 st.error("Error: " + str(e))       
                                     
-    footer = '<p style=\'text-align: center; font-size: 0.8em;\'>Copyright © 2023 LoopGlitch26</p>'
+    footer = '<p style=\'text-align: center; font-size: 0.8em;\'>Copyright © 2023 Bravish_LoopGlitch</p>'
     st.markdown(footer, unsafe_allow_html=True)        
         
 if __name__ == "__main__":
