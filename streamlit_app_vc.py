@@ -4,7 +4,6 @@ from indictrans import Transliterator
 import openai
 from gtts import gTTS
 from io import BytesIO
-import streamlit_webrtc as webrtc
 
 openai.api_key = st.secrets["openai_api_key"]
 
@@ -27,21 +26,10 @@ def text_to_speech(text):
     audio_bytes.seek(0)
     return audio_bytes.read()
 
-def run_chatbot():
+def run_chatbot():    
     default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:"
-    
-    audio_stream = webrtc.audio_recorder(
-        key="audio",
-        desired_output_format=webrtc.AudioOutputFormat.WAV,
-        device=webrtc.AudioDevice.DEFAULT,
-        options={"audio": True, "video": False, "audio_input_channels": 1},
-    )
-
     user_input = st.text_input("Enter your query in Hinglish:")
-    
-    if audio_stream.is_recording():
-        st.warning("Recording in progress.")
-        
+
     if user_input:
         try:
             hindi_text = Transliterator(source='eng', target='hin').transform(user_input)
@@ -56,4 +44,4 @@ def run_chatbot():
 if __name__ == "__main__":
     st.set_page_config(page_title="Hinglish Chatbot")
     st.title("Hinglish Chatbot")
-    run_chatbot()
+    run_chatbot() 
