@@ -84,8 +84,6 @@ def main():
             except Exception as e:
                 st.error("Error: " + str(e))        
     
-    footer = '<p style=\'text-align: center; font-size: 0.8em;\'>Copyright © 2023 LoopGlitch26</p>'
-    st.markdown(footer, unsafe_allow_html=True)
         
 if __name__ == "__main__":
     st.set_page_config(page_title="Hinglish Chatbot")
@@ -94,3 +92,6 @@ if __name__ == "__main__":
     else:
         sys.argv = ["streamlit", "run", sys.argv[0]]
         sys.exit(stcli.main())
+
+footer = '<p style=\'text-align: center; font-size: 0.8em;\'>Copyright © 2023 LoopGlitch26</p>'
+st.markdown(footer, unsafe_allow_html=True)        
