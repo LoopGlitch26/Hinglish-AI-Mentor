@@ -17,7 +17,7 @@ import numpy as np
 def main():
     openai.api_key = st.secrets["openai_api_key"]
     st.set_page_config(layout="centered")
-    title='<p style="font-family:Algerian; color:Red; align:center; font-size: 42px;">MicroMentor<p>'
+    title='<p style="font-family:Algerian; color:Cyan; align:center; font-size: 42px;">Hinglish AI ChatBot<p>'
     st.markdown(title,unsafe_allow_html=True)
     st.markdown("Hi, I'm MicroMentor, powered by AI.\nI'm here to help you with your micro-entrepreneurial issues.\nI can provide you with business tips and advice based on your business concerns.\nI can listen to you and I can also read your queries.\nSo, let's get started.")
     inp=st.selectbox("Which input form would you like", ['Text', 'Voice'])
@@ -28,9 +28,46 @@ def main():
             kw = st.text_input("",placeholder="Enter your query",key = "en_keyword")
             submit = form.form_submit_button("Get advice")
             if submit:
+                try:
+                hindi_text = Transliterator(source='eng', target='hin').transform(kw)
+                english_text = Translator().translate(hindi_text, dest='en').text
+                response = openai.Completion.create(
+                    engine="text-davinci-003", 
+                    prompt="Here's some advice for your query: " + english_text + "\nAdvice:",
+                    max_tokens=1024,
+                    n = 1,
+                    stop=None,
+                    temperature=0.8,
+                )
+                res=response.choices[0].text
+                myobj = gTTS(text=res,lang='hi', slow=False)
+                mp3_play=BytesIO()
+                myobj.write_to_fp(mp3_play)
+                st.audio(mp3_play,format="audio/mp3", start_time=0)
+                st.markdown(f"Here's some advice for your query:")
+                st.write(res)
+            except Exception as e:
+                st.error("Error: " + str(e))
+                
+
+    else :
+        model=whisper.load_model("base")
+        rec=st.button("Record your query")
+        st.markdown("Please don't use the stop button, it terminates the process abruptly\nWait for the 'get advice' button to appear and click it")
+        text=""
+        if rec:
+            wav_audio_data = st_audiorec()
+            time.sleep(10)
+            if wav_audio_data is not None:
+                ext = Transliterator(source='eng', target='hin').transform(model.transcribe(st.audio(wav_audio_data, format='audio/wav')))
+
+        submit = st.button("Get advice")
+        if submit:
+            try:
+                english_text = Translator().translate(text, dest='en').text
                 response = openai.Completion.create(
                     engine="text-davinci-002", 
-                    prompt="Here's some advice for your query: " + kw + "\nAdvice:",
+                    prompt="Here's some advice for your query: " + english_text + "\nAdvice:",
                     max_tokens=50,
                     n = 1,
                     stop=None,
@@ -43,37 +80,13 @@ def main():
                 st.audio(mp3_play,format="audio/mp3", start_time=0)
                 st.markdown(f"Here's some advice for your query:")
                 st.write(res)
-
-    else :
-        model=whisper.load_model("base")
-        rec=st.button("Record your query")
-        st.markdown("Please don't use the stop button, it terminates the process abruptly\nWait for the 'get advice' button to appear and click it")
-        text=""
-        if rec:
-            wav_audio_data = st_audiorec()
-            time.sleep(10)
-            if wav_audio_data is not None:
-                text=model.transcribe(st.audio(wav_audio_data, format='audio/wav'))
-
-        submit = st.button("Get advice")
-        if submit:
-            response = openai.Completion.create(
-                engine="text-davinci-002", 
-                prompt="Here's some advice for your query: " + text + "\nAdvice:",
-                max_tokens=50,
-                n = 1,
-                stop=None,
-                temperature=0.7,
-            )
-            res=response.choices[0].text
-            myobj = gTTS(text=res,lang='hi', slow=False)
-            mp3_play=BytesIO()
-            myobj.write_to_fp(mp3_play)
-            st.audio(mp3_play,format="audio/mp3", start_time=0)
-            st.markdown(f"Here's some advice for your query:")
-            st.write(res)
-
+            except Exception as e:
+                st.error("Error: " + str(e))
+            
+        
 if __name__ == "__main__":
+    st.set_page_config(page_title="Hinglish Chatbot")
+    st.title("Hinglish Chatbot")
     if runtime.exists():
         main()
     else:
