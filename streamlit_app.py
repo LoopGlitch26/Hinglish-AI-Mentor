@@ -20,6 +20,8 @@ def main():
     openai.api_key = st.secrets["openai_api_key"]
     title='<p style="font-family:Algerian; color:Cyan; align:center; font-size: 42px;">Hinglish AI ChatBot<p>'
     st.markdown(title,unsafe_allow_html=True)
+    footer = '<p style=\'text-align: center; font-size: 0.8em;\'>Copyright © 2023 My Company</p>'
+    st.markdown(footer, unsafe_allow_html=True)
     st.markdown("Hi, I'm MicroMentor, powered by AI.\nI'm here to help you with your micro-entrepreneurial issues.\nI can provide you with business tips and advice based on your business concerns.\nI can listen to you and I can also read your queries.\nSo, let's get started.")
     inp=st.selectbox("Which input form would you like", ['Text', 'Voice'])
     
@@ -85,7 +87,6 @@ def main():
         
 if __name__ == "__main__":
     st.set_page_config(page_title="Hinglish Chatbot")
-    st.title("Hinglish Chatbot")
     if runtime.exists():
         main()
     else:
