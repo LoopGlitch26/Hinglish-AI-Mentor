@@ -18,7 +18,7 @@ import numpy as np
 
 def main():
     openai.api_key = st.secrets["openai_api_key"]
-    title='<p style="font-family:Algerian; color:Red; align:center; font-size: 42px;">Hinglish AI ChatBot<p>'
+    title='<p style="font-family:Algerian; color:Blue; align:center; font-size: 42px;">Hinglish AI ChatBot<p>'
     st.markdown(title,unsafe_allow_html=True)
     
     st.markdown("AI-powered chatbot to assist you with your business queries and provide you with relevant advice.")
