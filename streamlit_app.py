@@ -7,7 +7,6 @@ from io import BytesIO
 from gtts import gTTS
 from streamlit.web import cli as stcli
 from streamlit import runtime
-from streamlit import set_theme
 import streamlit as st
 from dotenv import load_dotenv
 import streamlit.components.v1 as components
@@ -86,11 +85,9 @@ def main():
                                     
     footer = '<p style=\'text-align: center; font-size: 0.8em;\'>Copyright © Bravish</p>'
     st.markdown(footer, unsafe_allow_html=True)        
-    
-    st.set_theme('dark')
-    
+        
 if __name__ == "__main__":
-    st.set_page_config(page_title="Hinglish Chatbot")
+    st.set_page_config(page_title="Hinglish Chatbot", page_icon=":robot_face:", initial_sidebar_state="expanded", dark_mode=True)
     if runtime.exists():
         main()
     else:
