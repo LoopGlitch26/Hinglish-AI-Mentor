@@ -87,7 +87,7 @@ def main():
     st.markdown(footer, unsafe_allow_html=True)        
         
 if __name__ == "__main__":
-    st.set_page_config(page_title="Hinglish Chatbot", page_icon=":robot_face:", initial_sidebar_state="expanded", dark_mode=True)
+    st.set_page_config(page_title="Hinglish Chatbot", page_icon=":robot_face:", dark_mode=True)
     if runtime.exists():
         main()
     else:
