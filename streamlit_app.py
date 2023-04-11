@@ -1,81 +1,81 @@
-import streamlit as st
-import openai
-from gtts import gTTS
-from io import BytesIO
-import scipy.io.wavfile
-import wavio
-import whisper
 import os
+import openai
+import time
+from io import BytesIO
+from gtts import gTTS
+from streamlit.web import cli as stcli
+from streamlit import runtime
+import streamlit as st
+from dotenv import load_dotenv
+import streamlit.components.v1 as components
+from streamlit_audio_recorder.st_custom_components import st_audiorec
+from scipy.io.wavfile import write
+import wavio as wv
+import whisper
+import numpy as np
 
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+def main():
+    openai.api_key = st.secrets['OPEN_AI_KEY']
+    st.set_page_config(layout="centered")
+    title='<p style="font-family:Algerian; color:Red; align:center; font-size: 42px;">MicroMentor<p>'
+    st.markdown(title,unsafe_allow_html=True)
+    st.markdown("Hi, I'm MicroMentor, powered by AI.\nI'm here to help you with your micro-entrepreneurial issues.\nI can provide you with business tips and advice based on your business concerns.\nI can listen to you and I can also read your queries.\nSo, let's get started.")
+    inp=st.selectbox("Which input form would you like", ['Text', 'Voice'])
+    
+    form = st.form(key="user_settings")
+    if inp=="Text":
+        with form:
+            kw = st.text_input("",placeholder="Enter your query",key = "en_keyword")
+            submit = form.form_submit_button("Get advice")
+            if submit:
+                response = openai.Completion.create(
+                    engine="text-davinci-002", 
+                    prompt="Here's some advice for your query: " + kw + "\nAdvice:",
+                    max_tokens=50,
+                    n = 1,
+                    stop=None,
+                    temperature=0.7,
+                )
+                res=response.choices[0].text
+                myobj = gTTS(text=res,lang='hi', slow=False)
+                mp3_play=BytesIO()
+                myobj.write_to_fp(mp3_play)
+                st.audio(mp3_play,format="audio/mp3", start_time=0)
+                st.markdown(f"Here's some advice for your query:")
+                st.write(res)
 
-def chatbot_response(prompt):
-    completions = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        max_tokens=1024,
-        n=1,
-        stop=None,
-        temperature=0.8,
-    )
-    message = completions.choices[0].text
-    return message
+    else :
+        model=whisper.load_model("base")
+        rec=st.button("Record your query")
+        st.markdown("Please don't use the stop button, it terminates the process abruptly\nWait for the 'get advice' button to appear and click it")
+        text=""
+        if rec:
+            wav_audio_data = st_audiorec()
+            time.sleep(10)
+            if wav_audio_data is not None:
+                text=model.transcribe(st.audio(wav_audio_data, format='audio/wav'))
 
-def text_to_speech(text, speed=1.5):
-    audio_bytes = BytesIO()
-    tts = gTTS(text=text, lang="hi")
-    tts_speed = str(speed)
-    tts.save("temp.mp3")
-    wavio.write("temp.wav", scipy.io.wavfile.read("temp.mp3")[0], scipy.io.wavfile.read("temp.mp3")[1])
-    with open("temp.wav", "rb") as f:
-        audio_bytes.write(f.read())
-    audio_bytes.seek(0)
-    os.remove("temp.mp3")
-    os.remove("temp.wav")
-    return audio_bytes.read()
-
-def record_audio():
-    return st.audio_recorder("recording.wav", format="wav")
-
-def process_audio(audio_data):
-    scipy.io.wavfile.write("recording.wav", 44100, audio_data)
-    text = whisper.transcribe("recording.wav")
-    os.remove("recording.wav")
-    return text
-
-def run_chatbot():
-    input_mode = st.selectbox("Select Input Mode:", ["Text", "Voice"])
-
-    if input_mode == "Text":
-        default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:"
-        user_input = st.text_input("Enter your query in Hinglish:")
-
-        if user_input:
-            try:
-                prompt = default_prompt + "\nYou: " + user_input
-                response = chatbot_response(prompt)
-                st.success(f"Chatbot: {response}")
-                st.audio(text_to_speech(response), format="audio/wav")
-            except Exception as e:
-                st.error("Error: " + str(e))
-
-    elif input_mode == "Voice":
-        st.warning("Please speak your query in Hinglish:")
-        audio_data = record_audio()
-
-        if audio_data:
-            try:
-                text = process_audio(audio_data)
-                hindi_text = Transliterator(source='eng', target='hin').transform(text)
-                english_text = Translator().translate(hindi_text, dest='en').text
-                prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:\nYou: " + english_text
-                response = chatbot_response(prompt)
-                st.success(f"Chatbot: {response}")
-                st.audio(text_to_speech(response), format="audio/wav")
-            except Exception as e:
-                st.error("Error: " + str(e))
+        submit = st.button("Get advice")
+        if submit:
+            response = openai.Completion.create(
+                engine="text-davinci-002", 
+                prompt="Here's some advice for your query: " + text + "\nAdvice:",
+                max_tokens=50,
+                n = 1,
+                stop=None,
+                temperature=0.7,
+            )
+            res=response.choices[0].text
+            myobj = gTTS(text=res,lang='hi', slow=False)
+            mp3_play=BytesIO()
+            myobj.write_to_fp(mp3_play)
+            st.audio(mp3_play,format="audio/mp3", start_time=0)
+            st.markdown(f"Here's some advice for your query:")
+            st.write(res)
 
 if __name__ == "__main__":
-    st.set_page_config(page_title="Hinglish Chatbot")
-    st.title("Hinglish Chatbot")
-    run_chatbot()
+    if runtime.exists():
+        main()
+    else:
+        sys.argv = ["streamlit", "run", sys.argv[0]]
+        sys.exit(stcli.main())
