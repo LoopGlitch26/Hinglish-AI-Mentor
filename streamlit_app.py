@@ -86,12 +86,7 @@ def main():
     footer = '<p style=\'text-align: center; font-size: 0.8em;\'>Copyright © Bravish</p>'
     st.markdown(footer, unsafe_allow_html=True)        
     
-    theme = st.sidebar.selectbox("Select theme", ["Light", "Dark"])
-
-    if theme == "Light":
-        st.set_theme("base")
-    else:
-        st.set_theme("dark")
+    st.set_theme('dark')
     
 if __name__ == "__main__":
     st.set_page_config(page_title="Hinglish Chatbot")
