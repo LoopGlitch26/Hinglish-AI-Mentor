@@ -18,7 +18,7 @@ import numpy as np
 
 def main():
     openai.api_key = st.secrets["openai_api_key"]
-    title='<p style="font-family:Algerian; color:Cyan; align:center; font-size: 42px;">Hinglish AI ChatBot<p>'
+    title='<p style="font-family:Algerian; color:Red; align:center; font-size: 42px;">Hinglish AI ChatBot<p>'
     st.markdown(title,unsafe_allow_html=True)
     
     st.markdown("AI-powered chatbot to assist you with your business queries and provide you with relevant advice.")
@@ -83,7 +83,7 @@ def main():
             except Exception as e:
                 st.error("Error: " + str(e))       
                                     
-    footer = '<p style=\'text-align: center; font-size: 0.8em;\'>Copyright © 2023 Bravish_LoopGlitch</p>'
+    footer = '<p style=\'text-align: center; font-size: 0.8em;\'>Copyright © Bravish</p>'
     st.markdown(footer, unsafe_allow_html=True)        
         
 if __name__ == "__main__":
