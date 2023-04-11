@@ -31,25 +31,25 @@ def main():
             submit = form.form_submit_button("Get advice")
             if submit:
                 try:
-                hindi_text = Transliterator(source='eng', target='hin').transform(kw)
-                english_text = Translator().translate(hindi_text, dest='en').text
-                response = openai.Completion.create(
-                    engine="text-davinci-003", 
-                    prompt="Here's some advice for your query: " + english_text + "\nAdvice:",
-                    max_tokens=1024,
-                    n = 1,
-                    stop=None,
-                    temperature=0.8,
-                )
-                res=response.choices[0].text
-                myobj = gTTS(text=res,lang='hi', slow=False)
-                mp3_play=BytesIO()
-                myobj.write_to_fp(mp3_play)
-                st.audio(mp3_play,format="audio/mp3", start_time=0)
-                st.markdown(f"Here's some advice for your query:")
-                st.write(res)
-            except Exception as e:
-                st.error("Error: " + str(e))
+                    hindi_text = Transliterator(source='eng', target='hin').transform(kw)
+                    english_text = Translator().translate(hindi_text, dest='en').text
+                    response = openai.Completion.create(
+                        engine="text-davinci-003", 
+                        prompt="Here's some advice for your query: " + english_text + "\nAdvice:",
+                        max_tokens=1024,
+                        n = 1,
+                        stop=None,
+                        temperature=0.8,
+                    )
+                    res=response.choices[0].text
+                    myobj = gTTS(text=res,lang='hi', slow=False)
+                    mp3_play=BytesIO()
+                    myobj.write_to_fp(mp3_play)
+                    st.audio(mp3_play,format="audio/mp3", start_time=0)
+                    st.markdown(f"Here's some advice for your query:")
+                    st.write(res)
+                except Exception as e:
+                    st.error("Error: " + str(e))
                 
 
     else :
