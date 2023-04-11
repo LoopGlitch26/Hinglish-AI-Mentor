@@ -18,13 +18,13 @@ import numpy as np
 
 def main():
     openai.api_key = st.secrets["openai_api_key"]
-    title='<p style="color:Cyan; align:center; font-size: 42px;">Hinglish ChatBot<p>'
+    title='<p style="color:Red; align:center; font-size: 42px;">Hinglish ChatBot<p>'
     st.markdown(title,unsafe_allow_html=True)
     
     st.markdown("AI-powered chatbot to assist you with your business queries and provide you with relevant advice.")
     inp=st.selectbox("Which input form would you like", ['Text', 'Voice'])
     
-    default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:"
+    default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal: "
     form = st.form(key="user_settings")
     if inp=="Text":
         with form:
@@ -46,7 +46,7 @@ def main():
                     myobj = gTTS(text=res,lang='hi', slow=False)
                     mp3_play=BytesIO()
                     myobj.write_to_fp(mp3_play)
-                    st.audio(mp3_play,format="audio/mp3", start_time=0)
+                    st.audio(mp3_play,format="audio/mp3", start_time=0, playback_rate=1.5)
                     st.success(res)
                 except Exception as e:
                     st.error("Error: " + str(e))
@@ -78,7 +78,7 @@ def main():
                 myobj = gTTS(text=res,lang='hi', slow=False)
                 mp3_play=BytesIO()
                 myobj.write_to_fp(mp3_play)
-                st.audio(mp3_play,format="audio/mp3", start_time=0)
+                st.audio(mp3_play,format="audio/mp3", start_time=0, playback_rate=1.5)
                 st.success(res)
             except Exception as e:
                 st.error("Error: " + str(e))       
