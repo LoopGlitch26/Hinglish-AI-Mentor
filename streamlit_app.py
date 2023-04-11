@@ -24,6 +24,7 @@ def main():
     st.markdown("AI-powered chatbot to assist you with your business queries and provide you with relevant advice.")
     inp=st.selectbox("Which input form would you like", ['Text', 'Voice'])
     
+    default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:"
     form = st.form(key="user_settings")
     if inp=="Text":
         with form:
@@ -35,7 +36,7 @@ def main():
                     english_text = Translator().translate(hindi_text, dest='en').text
                     response = openai.Completion.create(
                         engine="text-davinci-003", 
-                        prompt="Here's some advice for your query: " + english_text + "\nAdvice:",
+                        prompt="Here's some advice for your query: " + english_text + "\n" + default_prompt,
                         max_tokens=1024,
                         n = 1,
                         stop=None,
@@ -68,7 +69,7 @@ def main():
                 english_text = Translator().translate(text, dest='en').text
                 response = openai.Completion.create(
                     engine="text-davinci-003", 
-                    prompt="Here's some advice for your query: " + english_text + "\nAdvice:",
+                    prompt="Here's some advice for your query: " + english_text + "\n" + default_prompt,
                     max_tokens=1024,
                     n = 1,
                     stop=None,
@@ -83,7 +84,7 @@ def main():
                 st.success(res)
             except Exception as e:
                 st.error("Error: " + str(e))       
-                
+                                    
     footer = '<p style=\'text-align: center; font-size: 0.8em;\'>Copyright © 2023 LoopGlitch26</p>'
     st.markdown(footer, unsafe_allow_html=True)        
         
