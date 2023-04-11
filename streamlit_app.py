@@ -51,7 +51,6 @@ def main():
                 except Exception as e:
                     st.error("Error: " + str(e))
                 
-
     else :
         model=whisper.load_model("base")
         rec=st.button("Record your query")
@@ -61,7 +60,7 @@ def main():
             wav_audio_data = st_audiorec()
             time.sleep(10)
             if wav_audio_data is not None:
-                ext = Transliterator(source='eng', target='hin').transform(model.transcribe(st.audio(wav_audio_data, format='audio/wav')))
+                text = Transliterator(source='eng', target='hin').transform(model.transcribe(st.audio(wav_audio_data, format='audio/wav')))
 
         submit = st.button("Get advice")
         if submit:
@@ -83,8 +82,7 @@ def main():
                 st.markdown(f"Here's some advice for your query:")
                 st.write(res)
             except Exception as e:
-                st.error("Error: " + str(e))
-            
+                st.error("Error: " + str(e))            
         
 if __name__ == "__main__":
     st.set_page_config(page_title="Hinglish Chatbot")
