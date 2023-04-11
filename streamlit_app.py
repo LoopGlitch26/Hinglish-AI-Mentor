@@ -46,7 +46,8 @@ def main():
                     myobj = gTTS(text=res,lang='hi', slow=False)
                     mp3_play=BytesIO()
                     myobj.write_to_fp(mp3_play)
-                    st.audio(mp3_play,format="audio/mp3", start_time=0, playback_rate=1.5)
+                    playback_rate = st.slider("Playback speed", min_value=0.5, max_value=2.0, value=1.5, step=0.1)
+                    st.audio(mp3_play,format="audio/mp3", start_time=0, playback_rate=playback_rate)
                     st.success(res)
                 except Exception as e:
                     st.error("Error: " + str(e))
@@ -78,7 +79,8 @@ def main():
                 myobj = gTTS(text=res,lang='hi', slow=False)
                 mp3_play=BytesIO()
                 myobj.write_to_fp(mp3_play)
-                st.audio(mp3_play,format="audio/mp3", start_time=0, playback_rate=1.5)
+                playback_rate = st.slider("Playback speed", min_value=0.5, max_value=2.0, value=1.5, step=0.1)
+                st.audio(mp3_play,format="audio/mp3", start_time=0, playback_rate=playback_rate)
                 st.success(res)
             except Exception as e:
                 st.error("Error: " + str(e))       
