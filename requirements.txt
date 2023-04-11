@@ -10,3 +10,6 @@ pydub
 ffmpeg
 soundfile
 streamlit_webrtc
+wavio
+scipy
+whisper
