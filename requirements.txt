@@ -10,7 +10,9 @@ pydub
 ffmpeg
 soundfile
 streamlit_webrtc
-wavio
-scipy
-whisper
+openai-whisper==20230124
 streamlit-player==0.1.5
+python-dotenv==0.21.1
+wavio==0.0.7
+scipy==1.9.1
+numpy==1.23.3
