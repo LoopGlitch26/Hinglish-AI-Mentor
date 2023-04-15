@@ -51,7 +51,7 @@ def main():
                     st.success(res)
                 except Exception as e:
                     st.error("Error: " + str(e))
-                
+    """            
     else :
         model=whisper.load_model("base")
         rec=st.button("Record your query")
@@ -67,6 +67,31 @@ def main():
                     st.warning("An error occurred while processing your query: {}".format(str(e)))
             else:
                 st.warning("No audio data was recorded")
+       """         
+    else:
+        rec = st.button("Record your query")
+        st.markdown("Please don't use the stop button, it terminates the process abruptly.\nWait for the 'get advice' button to appear and click it")
+        text = ""
+        if rec:
+            st.warning("Speak your query after clicking the button below")
+            audio_bytes = st.record(key="audio")
+            try:
+                from google.cloud import speech_v1
+                from google.cloud.speech_v1 import enums
+                from google.cloud.speech_v1 import types
+                client = speech_v1.SpeechClient()
+                audio = types.RecognitionAudio(content=audio_bytes.getvalue())
+                config = types.RecognitionConfig(
+                    encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
+                    sample_rate_hertz=16000,
+                    language_code="hi-IN",
+                )
+                response = client.recognize(config=config, audio=audio)
+                text = response.results[0].alternatives[0].transcript
+                st.success("Query recorded successfully")
+            except Exception as e:
+                st.error("An error occurred while processing your query: {}".format(str(e)))
+ 
       
         submit = st.button("Get advice")
         if submit:
