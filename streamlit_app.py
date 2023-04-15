@@ -51,24 +51,8 @@ def main():
                     st.success(res)
                 except Exception as e:
                     st.error("Error: " + str(e))
-    """            
+      
     else :
-        model=whisper.load_model("base")
-        rec=st.button("Record your query")
-        st.markdown("Please don't use the stop button, it terminates the process abruptly.\nWait for the 'get advice' button to appear and click it")
-        text=""
-        if rec:
-            wav_audio_data = st_audiorec()
-            time.sleep(10)
-            if wav_audio_data is not None:
-                try:
-                    text = model.transcribe(wav_audio_data)
-                except Exception as e:
-                    st.warning("An error occurred while processing your query: {}".format(str(e)))
-            else:
-                st.warning("No audio data was recorded")
-       """         
-    else:
         rec = st.button("Record your query")
         st.markdown("Please don't use the stop button, it terminates the process abruptly.\nWait for the 'get advice' button to appear and click it")
         text = ""
