@@ -2,11 +2,8 @@ import os
 import openai
 from googletrans import Translator
 from indictrans import Transliterator
-import time
 from io import BytesIO
 from gtts import gTTS
-from streamlit.web import cli as stcli
-from streamlit import runtime
 import streamlit as st
 from dotenv import load_dotenv
 import streamlit.components.v1 as components
@@ -18,16 +15,17 @@ import numpy as np
 import soundfile as sf
 
 def main():
-    openai.api_key = st.secrets["openai_api_key"]
-    title='<p style="color:Red; align:center; font-size: 42px;">Hinglish ChatBot<p>'
-    st.markdown(title,unsafe_allow_html=True)
+    load_dotenv()
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    title = '<p style="color:Red; text-align:center; font-size: 42px;">Hinglish ChatBot</p>'
+    st.markdown(title, unsafe_allow_html=True)
     
     st.markdown("AI-powered chatbot to assist you with your business queries and provide you with relevant advice.")
-    inp=st.selectbox("Which input form would you like", ['Text', 'Voice'])
+    inp = st.selectbox("Which input form would you like", ['Text', 'Voice'])
     
     default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal: "
     form = st.form(key="user_settings")
-    if inp=="Text":
+    if inp == "Text":
         with form:
             kw = st.text_input("Enter your query in Hinglish:", key="en_keyword", placeholder="Type here...")
             submit = form.form_submit_button("Get advice")
@@ -39,22 +37,22 @@ def main():
                         engine="text-davinci-003", 
                         prompt=default_prompt + "\n" + english_text,
                         max_tokens=1024,
-                        n = 1,
+                        n=1,
                         stop=None,
                         temperature=0.8,
                     )
-                    res=response.choices[0].text
-                    myobj = gTTS(text=res,lang='hi', slow=False)
-                    mp3_play=BytesIO()
+                    res = response.choices[0].text
+                    myobj = gTTS(text=res, lang='hi', slow=False)
+                    mp3_play = BytesIO()
                     myobj.write_to_fp(mp3_play)
-                    st.audio(mp3_play,format="audio/mp3", start_time=0)
+                    st.audio(mp3_play, format="audio/mp3", start_time=0)
                     st.success(res)
                 except Exception as e:
                     st.error("Error: " + str(e))
       
-    else :
+    else:
         rec = st.button("Record your query")
-        st.markdown("Please don't use the stop button, it terminates the process abruptly.\nWait for the 'get advice' button to appear and click it")
+        st.markdown("Please don't use the stop button, it terminates the process abruptly. Wait for the 'get advice' button to appear and click it")
         text = ""
         if rec:
             st.warning("Speak your query after clicking the button below")
