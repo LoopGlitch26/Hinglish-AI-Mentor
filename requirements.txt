@@ -17,3 +17,5 @@ wavio==0.0.7
 scipy==1.9.1
 numpy==1.23.3
 ipython
+streamlit-state
+google-cloud-speech
