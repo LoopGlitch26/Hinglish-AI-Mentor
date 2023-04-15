@@ -52,25 +52,26 @@ def main():
                 except Exception as e:
                     st.error("Error: " + str(e))
                 
-    else:
-        rec = st_audio_recorder(sample_rate=16000, duration=10, key="recorder")
-        st.markdown("Click on the record button and speak your query...")
-        if st.button("Record"):
+    else :
+        model=whisper.load_model("base")
+        rec=st.button("Record your query")
+        st.markdown("Please don't use the stop button, it terminates the process abruptly.\nWait for the 'get advice' button to appear and click it")
+        text=""
+        if rec:
+            wav_audio_data = st_audiorec()
+            time.sleep(10)
+            if wav_audio_data is not None:
+                try:
+                    text = model.transcribe(wav_audio_data)
+                except Exception as e:
+                    st.warning("An error occurred while processing your query: {}".format(str(e)))
+            else:
+                st.warning("No audio data was recorded")
+      
+        submit = st.button("Get advice")
+        if submit:
             try:
-                with rec:
-                    audio = rec.record(duration=10)
-                st.success("Recording complete!")
-                write("audio.wav", 16000, audio)
-                audio_data, sr = sf.read("audio.wav")
-                processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-large-xlsr-53")
-                model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-large-xlsr-53")
-                input_values = processor(audio_data, sampling_rate=sr, return_tensors="pt").input_values
-                with torch.no_grad():
-                    logits = model(input_values).logits
-                predicted_ids = torch.argmax(logits, dim=-1)
-                transcriptions = processor.batch_decode(predicted_ids)
-                hindi_text = Transliterator(source='eng', target='hin').transform(transcriptions[0])
-                english_text = Translator().translate(hindi_text, dest='en').text
+                english_text = Translator().translate(text, dest='en').text
                 response = openai.Completion.create(
                     engine="text-davinci-003", 
                     prompt=default_prompt + "\n" + english_text,
@@ -79,11 +80,14 @@ def main():
                     stop=None,
                     temperature=0.8,
                 )
-                res = response.choices[0].text
-                myobj = gTTS(text=res, lang='hi', slow=False)
-                mp3_play = BytesIO()
+                res=response.choices[0].text
+                myobj = gTTS(text=res,lang='hi', slow=False)
+                mp3_play=BytesIO()
+                myobj.write_to_fp(mp3_play)
+                st.audio(mp3_play,format="audio/mp3", start_time=0)
+                st.success(res)
             except Exception as e:
-                st.error(f"Error: {e}")
+                st.error("Error: " + str(e))       
                                     
     footer = '<p style=\'text-align: center; font-size: 0.8em;\'>Copyright © Bravish</p>'
     st.markdown(footer, unsafe_allow_html=True)        
