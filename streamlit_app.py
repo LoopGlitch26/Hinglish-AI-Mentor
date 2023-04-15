@@ -16,6 +16,8 @@ import wavio as wv
 import whisper
 import numpy as np
 import soundfile as sf
+from streamlit.state.session_state import SessionState
+from google.cloud import speech_v1p1beta1 as speech
 
 def main():
     openai.api_key = st.secrets["openai_api_key"]
@@ -31,6 +33,7 @@ def main():
         with form:
             kw = st.text_input("Enter your query in Hinglish:", key="en_keyword", placeholder="Type here...")
             submit = form.form_submit_button("Get advice")
+            state = SessionState.get(chat_history=[])
             if submit:
                 try:
                     hindi_text = Transliterator(source='eng', target='hin').transform(kw)
@@ -49,45 +52,50 @@ def main():
                     myobj.write_to_fp(mp3_play)
                     st.audio(mp3_play,format="audio/mp3", start_time=0)
                     st.success(res)
+                    state.chat_history.append((text, res))
                 except Exception as e:
                     st.error("Error: " + str(e))
-                
-    else :
-        model=whisper.load_model("base")
+            
+            if state.chat_history:
+                st.subheader("Chat history")
+                for i, (q, a) in enumerate(state.chat_history):
+                    st.write(f"Query {i+1}: {q}")
+                    st.write(f"Answer {i+1}:           
+               
+    else:
+        client = speech.SpeechClient()
         rec=st.button("Record your query")
         st.markdown("Please don't use the stop button, it terminates the process abruptly.\nWait for the 'get advice' button to appear and click it")
         text=""
         if rec:
+            audio_config = speech.RecognitionConfig(
+                encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+                sample_rate_hertz=16000,
+                language_code="hi-IN",
+            )
+            streaming_config = speech.StreamingRecognitionConfig(
+                config=audio_config, interim_results=True,
+            )
+
+            def generate_requests(audio_data):
+                request = speech.StreamingRecognizeRequest(audio_content=audio_data)
+                yield request
+
             wav_audio_data = st_audiorec()
-            time.sleep(10)
             if wav_audio_data is not None:
                 try:
-                    text = model.transcribe(wav_audio_data)
+                    requests = generate_requests(wav_audio_data)
+                    responses = client.streaming_recognize(streaming_config, requests)
+                    text = ""
+                    for response in responses:
+                        for result in response.results:
+                            if result.is_final:
+                                text += result.alternatives[0].transcript
+                    st.success("Query recorded successfully!")
                 except Exception as e:
                     st.warning("An error occurred while processing your query: {}".format(str(e)))
             else:
-                st.warning("No audio data was recorded")
-      
-        submit = st.button("Get advice")
-        if submit:
-            try:
-                english_text = Translator().translate(text, dest='en').text
-                response = openai.Completion.create(
-                    engine="text-davinci-003", 
-                    prompt=default_prompt + "\n" + english_text,
-                    max_tokens=1024,
-                    n = 1,
-                    stop=None,
-                    temperature=0.8,
-                )
-                res=response.choices[0].text
-                myobj = gTTS(text=res,lang='hi', slow=False)
-                mp3_play=BytesIO()
-                myobj.write_to_fp(mp3_play)
-                st.audio(mp3_play,format="audio/mp3", start_time=0)
-                st.success(res)
-            except Exception as e:
-                st.error("Error: " + str(e))       
+                st.warning("No audio data was recorded")    
                                     
     footer = '<p style=\'text-align: center; font-size: 0.8em;\'>Copyright © Bravish</p>'
     st.markdown(footer, unsafe_allow_html=True)        
