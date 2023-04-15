@@ -13,6 +13,7 @@ import wavio as wv
 import whisper
 import numpy as np
 import soundfile as sf
+from streamlit import runtime
 
 def main():
     load_dotenv()
