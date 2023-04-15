@@ -11,6 +11,8 @@ import streamlit as st
 from dotenv import load_dotenv
 import streamlit.components.v1 as components
 from streamlit_audio_recorder.st_custom_components import st_audiorec
+import streamlit_chat
+from streamlit_chat import st_chat
 from scipy.io.wavfile import write
 import wavio as wv
 import whisper
@@ -29,7 +31,7 @@ def main():
     form = st.form(key="user_settings")
     if inp=="Text":
         with form:
-            kw = st.text_input("Enter your query in Hinglish:", key="en_keyword", placeholder="Type here...")
+            kw = st_chat("Enter your query in Hinglish:", key="en_keyword", placeholder="Type here...")
             submit = form.form_submit_button("Get advice")
             if submit:
                 try:
