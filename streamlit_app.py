@@ -32,7 +32,8 @@ def main():
     language_options = ['Odia', 'Telugu', 'Hindi', 'English']
     selected_language = st.selectbox("Select your regional language:", language_options)
 
-    default_prompt = f"Answer in details in {selected_language} language. Aap ek {business_type} microentrepreneur ke mentor hai. Microentrepreneur ka sawaal: "
+    #default_prompt = f"Answer in details in {selected_language} language. Aap ek {business_type} microentrepreneur ke mentor hai. Microentrepreneur ka sawaal: "
+    default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal: "
     
     inp = st.selectbox("Which input form would you like", ['Text', 'Voice'])
 
