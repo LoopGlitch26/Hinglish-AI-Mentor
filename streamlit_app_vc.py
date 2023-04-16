@@ -26,7 +26,7 @@ def text_to_speech(text, slow=False):
     if slow:
         tts.speed = 0.5
     else:
-        tts.speed = 1.0
+        tts.speed = 2.0
     
     tts.write_to_fp(audio_bytes)
     audio_bytes.seek(0)
