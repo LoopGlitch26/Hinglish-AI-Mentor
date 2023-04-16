@@ -6,10 +6,6 @@ from gtts import gTTS
 from io import BytesIO
 import speech_recognition as sr
 
-from bokeh.models.widgets import Button
-from bokeh.models import CustomJS
-from streamlit_bokeh_events import streamlit_bokeh_events
-
 openai.api_key = st.secrets["openai_api_key"]
 
 def chatbot_response(prompt):
@@ -34,43 +30,19 @@ def text_to_speech(text):
 def run_chatbot():    
     default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:"
     user_input = st.text_input("Enter your query in Hinglish:")
-    stt_button = Button(label="Speak", width=100)
-
-    r = sr.Recognizer()
-    mic = sr.Microphone()
-    try:
-        with mic as source:
-            r.adjust_for_ambient_noise(source)
-    except Exception as e:
-        st.error("Error: " + str(e))
-        return
-
-    def transcribe_audio():
-        with mic as source:
+    stt_button = st.button("Speak")
+    
+    if stt_button:
+        r = sr.Recognizer()
+        with sr.Microphone() as source:
+            st.write("Say something...")
             audio = r.listen(source)
-        text = r.recognize_google(audio, language='hi-IN')
-        return text
-
-    stt_button.js_on_event("button_click", CustomJS(code="""
-        document.dispatchEvent(new CustomEvent("START_SPEECH"));
-    """))
-
-    result = streamlit_bokeh_events(
-        stt_button,
-        events="START_SPEECH",
-        key="listen",
-        refresh_on_update=False,
-        override_height=75,
-        debounce_time=0
-    )
-
-    if result:
-        if "START_SPEECH" in result:
-            try:
-                user_input = transcribe_audio()
-                st.text_input("Your query is:", user_input)
-            except Exception as e:
-                st.error("Error: " + str(e))
+            st.write("Processing...")
+        try:
+            user_input = r.recognize_google(audio, language='hi-IN')
+            st.text_input("Your query is:", user_input)
+        except Exception as e:
+            st.error("Error: " + str(e))
 
     if user_input:
         try:
