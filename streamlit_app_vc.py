@@ -35,10 +35,9 @@ def run_chatbot():
     stt_button = Button(label="Speak", width=100)
     
     stt_button.js_on_event("button_click", CustomJS(code="""
-        var recognition = new webkitSpeechRecognition();
+        var recognition = new webkitSpeechRecognition() || SpeechRecognition();
         recognition.continuous = true;
         recognition.interimResults = true;
-
         recognition.onresult = function (e) {
             var value = "";
             for (var i = e.resultIndex; i < e.results.length; ++i) {
