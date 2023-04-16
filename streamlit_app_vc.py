@@ -4,7 +4,7 @@ from indictrans import Transliterator
 import openai
 from gtts import gTTS
 from io import BytesIO
-import speech_recognition as sr
+import azure.cognitiveservices.speech as speechsdk
 
 openai.api_key = st.secrets["openai_api_key"]
 
@@ -27,22 +27,9 @@ def text_to_speech(text):
     audio_bytes.seek(0)
     return audio_bytes.read()
 
-def run_chatbot():    
+def run_chatbot():
     default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:"
     user_input = st.text_input("Enter your query in Hinglish:")
-    stt_button = st.button("Speak")
-    
-    if stt_button:
-        r = sr.Recognizer()
-        with sr.Microphone() as source:
-            st.write("Say something...")
-            audio = r.listen(source)
-            st.write("Processing...")
-        try:
-            user_input = r.recognize_google(audio, language='hi-IN')
-            st.text_input("Your query is:", user_input)
-        except Exception as e:
-            st.error("Error: " + str(e))
 
     if user_input:
         try:
@@ -54,6 +41,20 @@ def run_chatbot():
             st.audio(text_to_speech(response), format="audio/wav")
         except Exception as e:
             st.error("Error: " + str(e))
+    
+    voice_input = st.button("Speak")
+    if voice_input:
+        speech_key, service_region = st.secrets["azure_key"], st.secrets["azure_region"]
+        speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
+        speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config)
+        st.write("Speak now...")
+        result = speech_recognizer.recognize_once()
+        if result.reason == speechsdk.ResultReason.RecognizedSpeech:
+            st.write(f"You: {result.text}")
+        elif result.reason == speechsdk.ResultReason.NoMatch:
+            st.warning("Sorry, I could not recognize what you said.")
+        elif result.reason == speechsdk.ResultReason.Canceled:
+            st.error("Speech recognition canceled: {0}".format(result.cancellation_details.reason))
 
 if __name__ == "__main__":
     st.set_page_config(page_title="Hinglish Chatbot")
