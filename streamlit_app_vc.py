@@ -22,7 +22,7 @@ def run_chatbot():
     
     use_voice_input = st.checkbox("Use voice input")
     if use_voice_input:
-        speech_config = speechsdk.SpeechConfig(subscription=st.secrets["azure_speech_subscription_key"], region=st.secrets["azure_speech_region"])
+        speech_config = speechsdk.SpeechConfig(subscription=st.secrets["azure_key"], region=st.secrets["azure_region"])
         audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
         recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
         st.info("Speak your query in Hinglish...")
