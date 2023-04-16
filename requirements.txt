@@ -22,4 +22,4 @@ google-cloud-speech
 streamlit-chat
 bokeh
 streamlit_bokeh_events
-pyaudio
+pyaudio==0.2.11
