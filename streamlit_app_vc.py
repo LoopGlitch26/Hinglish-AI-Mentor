@@ -19,15 +19,9 @@ def chatbot_response(prompt):
     message = completions.choices[0].text
     return message
 
-def text_to_speech(text, slow=False):
+def text_to_speech(text):
     audio_bytes = BytesIO()
     tts = gTTS(text=text, lang="hi")
-    
-    if slow:
-        tts.speed = 0.5
-    else:
-        tts.speed = 2.0
-    
     tts.write_to_fp(audio_bytes)
     audio_bytes.seek(0)
     return audio_bytes.read()
