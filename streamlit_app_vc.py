@@ -4,10 +4,6 @@ from indictrans import Transliterator
 import openai
 from gtts import gTTS
 from io import BytesIO
-import os
-import tempfile
-import playsound
-from pydub import AudioSegment
 
 openai.api_key = st.secrets["openai_api_key"]
 
@@ -24,14 +20,11 @@ def chatbot_response(prompt):
     return message
 
 def text_to_speech(text):
-    audio_file = tempfile.NamedTemporaryFile(delete=False)
+    audio_bytes = BytesIO()
     tts = gTTS(text=text, lang="hi")
-    tts.save(audio_file.name + ".mp3")
-    audio = AudioSegment.from_file(audio_file.name + ".mp3", format="mp3")
-    audio = audio.speedup(playback_speed=1.5)
-    audio.export(audio_file.name + ".mp3", format="mp3")
-    playsound.playsound(audio_file.name + ".mp3", True)
-    os.unlink(audio_file.name + ".mp3")
+    tts.write_to_fp(audio_bytes)
+    audio_bytes.seek(0)
+    return audio_bytes.read()
 
 def run_chatbot():    
     default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:"
