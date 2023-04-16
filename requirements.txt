@@ -20,6 +20,3 @@ ipython
 streamlit-state
 google-cloud-speech
 streamlit-chat
-bokeh
-streamlit_bokeh_events
-pyaudio==0.2.11
