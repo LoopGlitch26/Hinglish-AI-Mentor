@@ -8,29 +8,33 @@ import azure.cognitiveservices.speech as speechsdk
 
 openai.api_key = st.secrets["openai_api_key"]
 
-def chatbot_response(prompt):
-    completions = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        max_tokens=1024,
-        n=1,
-        stop=None,
-        temperature=0.8,
-    )
-    message = completions.choices[0].text
-    return message
+def text_to_speech(text, speaking_rate=1.0):
+    speech_config = speechsdk.SpeechConfig(subscription=st.secrets["azure_key"], region=st.secrets["azure_region"])
+    synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config)
+    ssml_string = f'<speak version="1.0" xmlns="https://www.w3.org/2001/10/synthesis" xml:lang="hi-IN"><prosody rate="{speaking_rate}">{text}</prosody></speak>'
+    result = synthesizer.speak_ssml_async(ssml_string).get()
+    stream = result.audio_data
+    audio_bytes = stream.read_all()
+    return audio_bytes
 
-def text_to_speech(text):
-    audio_bytes = BytesIO()
-    tts = gTTS(text=text, lang="hi")
-    tts.write_to_fp(audio_bytes)
-    audio_bytes.seek(0)
-    return audio_bytes.read()
-
-def run_chatbot():
+def run_chatbot():    
     default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:"
-    user_input = st.text_input("Enter your query in Hinglish:")
-
+    
+    use_voice_input = st.checkbox("Use voice input")
+    if use_voice_input:
+        speech_config = speechsdk.SpeechConfig(subscription=st.secrets["azure_speech_subscription_key"], region=st.secrets["azure_speech_region"])
+        audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
+        recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
+        st.info("Speak your query in Hinglish...")
+        result = recognizer.recognize_once_async().get()
+        if result.reason == speechsdk.ResultReason.RecognizedSpeech:
+            user_input = result.text
+        else:
+            st.warning("Could not recognize speech")
+            user_input = ""
+    else:
+        user_input = st.text_input("Enter your query in Hinglish:")
+    
     if user_input:
         try:
             hindi_text = Transliterator(source='eng', target='hin').transform(user_input)
@@ -38,23 +42,10 @@ def run_chatbot():
             prompt = default_prompt + "\nYou: " + english_text      
             response = chatbot_response(prompt)
             st.success(f"Chatbot: {response}")
-            st.audio(text_to_speech(response), format="audio/wav")
+            st.audio(text_to_speech(response, speaking_rate=1.5), format="audio/wav")
         except Exception as e:
             st.error("Error: " + str(e))
-    
-    voice_input = st.button("Speak")
-    if voice_input:
-        speech_key, service_region = st.secrets["azure_key"], st.secrets["azure_region"]
-        speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
-        speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config)
-        st.write("Speak now...")
-        result = speech_recognizer.recognize_once()
-        if result.reason == speechsdk.ResultReason.RecognizedSpeech:
-            st.write(f"You: {result.text}")
-        elif result.reason == speechsdk.ResultReason.NoMatch:
-            st.warning("Sorry, I could not recognize what you said.")
-        elif result.reason == speechsdk.ResultReason.Canceled:
-            st.error("Speech recognition canceled: {0}".format(result.cancellation_details.reason))
+
 
 if __name__ == "__main__":
     st.set_page_config(page_title="Hinglish Chatbot")
