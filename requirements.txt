@@ -20,3 +20,4 @@ ipython
 streamlit-state
 google-cloud-speech
 streamlit-chat
+bokeh
