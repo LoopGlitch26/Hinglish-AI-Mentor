@@ -10,12 +10,11 @@ from streamlit import runtime
 import streamlit as st
 from dotenv import load_dotenv
 import streamlit.components.v1 as components
-from streamlit_audio_recorder.st_custom_components import st_audiorec
 from scipy.io.wavfile import write
-import wavio as wv
 import whisper
 import numpy as np
 import soundfile as sf
+import sounddevice as sd
 
 def main():
     openai.api_key = st.secrets["openai_api_key"]
@@ -63,14 +62,17 @@ def main():
                 except Exception as e:
                     st.error("Error: " + str(e))
                 
-    else :
-        model=whisper.load_model("base")
-        rec=st.button("Record your query")
+    else:
+        model = whisper.load_model("base")
+        rec = st.button("Record your query")
         st.markdown("Please don't use the stop button, it terminates the process abruptly.\nWait for the 'get advice' button to appear and click it")
-        text=""
+        text = ""
         if rec:
-            wav_audio_data = st_audiorec()
-            time.sleep(10)
+            duration = 30  # Set the duration of the recording
+            fs = 16000  # Set the sample rate
+            recording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
+            sd.wait()  # Wait until recording is complete
+            wav_audio_data = recording.flatten()
             if wav_audio_data is not None:
                 try:
                     text = model.transcribe(wav_audio_data)
