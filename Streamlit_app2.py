@@ -50,8 +50,8 @@ def run_chatbot():
         record_button = st.button("Start Recording")
         if record_button:
             with st.spinner("Recording..."):
-                duration = 10  # You can adjust the duration of the recording
-                fs = 16000  # Sample rate (16 kHz)
+                duration = 10 
+                fs = 16000 
                 frames = int(duration * fs)
                 recording = st.whisper.record(duration=duration, sample_rate=fs)
                 st.warning("Recording completed!")
