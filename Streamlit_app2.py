@@ -14,7 +14,6 @@ from scipy.io.wavfile import write
 import whisper
 import numpy as np
 import soundfile as sf
-import sounddevice as sd
 
 def main():
     openai.api_key = st.secrets["openai_api_key"]
@@ -68,18 +67,17 @@ def main():
         st.markdown("Please don't use the stop button, it terminates the process abruptly.\nWait for the 'get advice' button to appear and click it")
         text = ""
         if rec:
-            duration = 30  # Set the duration of the recording
+            duration = 10  # Set the duration of the recording (in seconds)
             fs = 16000  # Set the sample rate
             recording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
             sd.wait()  # Wait until recording is complete
-            wav_audio_data = recording.flatten()
-            if wav_audio_data is not None:
-                try:
-                    text = model.transcribe(wav_audio_data)
-                except Exception as e:
-                    st.warning("An error occurred while processing your query: {}".format(str(e)))
-            else:
-                st.warning("No audio data was recorded")
+            wav_filename = "recording.wav"
+            sf.write(wav_filename, recording, fs)
+            try:
+                audio_data, _ = sf.read(wav_filename)
+                text = model.transcribe(audio_data)
+            except Exception as e:
+                st.warning("An error occurred while processing your query: {}".format(str(e)))
       
         submit = st.button("Get advice")
         if submit:
