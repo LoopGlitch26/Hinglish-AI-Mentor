@@ -1,112 +1,75 @@
-import os
-import openai
+import streamlit as st
 from googletrans import Translator
 from indictrans import Transliterator
-import time
-from io import BytesIO
+import openai
 from gtts import gTTS
-from streamlit.web import cli as stcli
-from streamlit import runtime
-import streamlit as st
-from dotenv import load_dotenv
-import streamlit.components.v1 as components
-from scipy.io.wavfile import write
+from io import BytesIO
 import whisper
-import numpy as np
-import soundfile as sf
 
-def main():
-    openai.api_key = st.secrets["openai_api_key"]
-    title='<p style="color:Red; align:center; font-size: 42px;">Hinglish ChatBot<p>'
-    st.markdown(title,unsafe_allow_html=True)
-    
-    st.markdown("AI-powered chatbot to assist you with your business queries and provide you with relevant advice.")
-    
-    business_options = ['Kirana store / किराना स्टोर', 'Beauty parlor / ब्यूटी पार्लर', 'Food stall / खाने की दुकान', 'Mobile repair shop / मोबाइल रिपेयर शॉप', 'Other']
-    business_type = st.selectbox("What is your type of business?", business_options)
-    if business_type == 'Other':
-        business_type = st.text_input("Enter your business type:")
-        
-    language_options = ['Odia', 'Telugu', 'Hindi', 'English']
-    selected_language = st.selectbox("Select your regional language:", language_options)
+openai.api_key = st.secrets["openai_api_key"]
 
-    #default_prompt = f"Answer in details in {selected_language} language. Aap ek {business_type} microentrepreneur ke mentor hai. Microentrepreneur ka sawaal: "
-    default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal: "
-    
-    inp = st.selectbox("Which input form would you like", ['Text', 'Voice'])
+def chatbot_response(prompt):
+    completions = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        max_tokens=1024,
+        n=1,
+        stop=None,
+        temperature=0.8,
+    )
+    message = completions.choices[0].text
+    return message
 
-    form = st.form(key="user_settings")
-    if inp=="Text":
-        with form:
-            kw = st.text_input("Enter your query in Hinglish:", key="en_keyword", placeholder="Type here...")
-            submit = form.form_submit_button("Get advice")
-            if submit:
+def text_to_speech(text):
+    audio_bytes = BytesIO()
+    tts = gTTS(text=text, lang="hi", slow=False)
+    tts.write_to_fp(audio_bytes)
+    audio_bytes.seek(0)
+    return audio_bytes.read()
+
+def run_chatbot():
+    model = whisper.load_model("whisper/asr_deepspeech_tamil_0.9.0.model")
+    
+    default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:"
+    user_input = st.selectbox("Select your input method:", ["Text", "Voice"])
+    
+    if user_input == "Text":
+        user_text = st.text_input("Enter your query in Hinglish:")
+        if user_text:
+            try:
+                hindi_text = Transliterator(source='eng', target='hin').transform(user_text)
+                english_text = Translator().translate(hindi_text, dest='en').text
+                prompt = default_prompt + "\nYou: " + english_text
+                response = chatbot_response(prompt)
+                st.success(f"Chatbot: {response}")
+                st.audio(text_to_speech(response), format="audio/wav")
+            except Exception as e:
+                st.error("Error: " + str(e))
+    elif user_input == "Voice":
+        st.warning("Click the 'Start Recording' button and speak your query.")
+        record_button = st.button("Start Recording")
+        if record_button:
+            with st.spinner("Recording..."):
+                duration = 10  # You can adjust the duration of the recording
+                fs = 16000  # Sample rate (16 kHz)
+                frames = int(duration * fs)
+                recording = st.whisper.record(duration=duration, sample_rate=fs)
+                st.warning("Recording completed!")
+                st.audio(recording, format="audio/wav", start_time=0)
+                decoded_text = model.transcribe(recording)
+                st.info(f"You said: {decoded_text}")
                 try:
-                    hindi_text = Transliterator(source='eng', target='hin').transform(kw)
+                    hindi_text = Transliterator(source='eng', target='hin').transform(decoded_text)
                     english_text = Translator().translate(hindi_text, dest='en').text
-                    response = openai.Completion.create(
-                        engine="text-davinci-003", 
-                        prompt=default_prompt + "\n" + english_text,
-                        max_tokens=1024,
-                        n = 1,
-                        stop=None,
-                        temperature=0.8,
-                    )
-                    res=response.choices[0].text
-                    myobj = gTTS(text=res,lang='hi', slow=False)
-                    mp3_play=BytesIO()
-                    myobj.write_to_fp(mp3_play)
-                    st.audio(mp3_play,format="audio/mp3", start_time=0)
-                    st.success(res)
+                    prompt = default_prompt + "\nYou: " + english_text
+                    response = chatbot_response(prompt)
+                    st.success(f"Chatbot: {response}")
+                    st.audio(text_to_speech(response), format="audio/wav")
                 except Exception as e:
                     st.error("Error: " + str(e))
-                
-    else:
-        model = whisper.load_model("base")
-        rec = st.button("Record your query")
-        st.markdown("Please don't use the stop button, it terminates the process abruptly.\nWait for the 'get advice' button to appear and click it")
-        text = ""
-        if rec:
-            duration = 10  # Set the duration of the recording (in seconds)
-            fs = 16000  # Set the sample rate
-            recording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
-            sd.wait()  # Wait until recording is complete
-            wav_filename = "recording.wav"
-            sf.write(wav_filename, recording, fs)
-            try:
-                audio_data, _ = sf.read(wav_filename)
-                text = model.transcribe(audio_data)
-            except Exception as e:
-                st.warning("An error occurred while processing your query: {}".format(str(e)))
-      
-        submit = st.button("Get advice")
-        if submit:
-            try:
-                english_text = Translator().translate(text, dest='en').text
-                response = openai.Completion.create(
-                    engine="text-davinci-003", 
-                    prompt=default_prompt + "\n" + english_text,
-                    max_tokens=1024,
-                    n = 1,
-                    stop=None,
-                    temperature=0.8,
-                )
-                res=response.choices[0].text
-                myobj = gTTS(text=res,lang='hi', slow=False)
-                mp3_play=BytesIO()
-                myobj.write_to_fp(mp3_play)
-                st.audio(mp3_play,format="audio/mp3", start_time=0)
-                st.success(res)
-            except Exception as e:
-                st.error("Error: " + str(e))       
-                                    
-    footer = '<p style=\'text-align: center; font-size: 0.8em;\'>Copyright © Bravish</p>'
-    st.markdown(footer, unsafe_allow_html=True)        
-        
+    
+
 if __name__ == "__main__":
     st.set_page_config(page_title="Hinglish Chatbot")
-    if runtime.exists():
-        main()
-    else:
-        sys.argv = ["streamlit", "run", sys.argv[0]]
-        sys.exit(stcli.main())
+    st.title("Hinglish Chatbot")
+    run_chatbot()
