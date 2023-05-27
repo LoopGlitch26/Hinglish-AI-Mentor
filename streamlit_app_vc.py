@@ -5,6 +5,7 @@ import openai
 from gtts import gTTS
 from io import BytesIO
 import assemblyai
+from streamlit_audio_recorder import st_audio_recorder
 
 openai.api_key = st.secrets["openai_api_key"]
 
@@ -30,7 +31,7 @@ def text_to_speech(text):
 def run_chatbot():    
     default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:"
     user_input = st.text_input("Enter your query in Hinglish:")
-    user_audio = st.file_uploader("Or upload an audio file:", type=["wav", "mp3"])
+    user_audio = st_audio_recorder(start_recording=False, format="WAV")
 
     if user_input:
         try:
@@ -47,7 +48,7 @@ def run_chatbot():
         try:
             assemblyai.settings.api_key = "0b0a5dff3d4a4893af85204dc660f88b"
             transcriber = assemblyai.Transcriber()
-            audio_data = user_audio.read()
+            audio_data = user_audio.getvalue()
             transcript = transcriber.transcribe(audio_data)
             transcribed_text = transcript.text
 
