@@ -22,4 +22,3 @@ google-cloud-speech
 streamlit-chat
 playsound
 assemblyai
-webrtc_audio_processor
