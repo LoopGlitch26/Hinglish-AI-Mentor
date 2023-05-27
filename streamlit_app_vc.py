@@ -4,7 +4,7 @@ from indictrans import Transliterator
 import openai
 from gtts import gTTS
 from io import BytesIO
-import requests
+from transformers import pipeline
 
 openai.api_key = st.secrets["openai_api_key"]
 
@@ -27,45 +27,11 @@ def text_to_speech(text):
     audio_bytes.seek(0)
     return audio_bytes.read()
 
-def transcribe_audio(audio_data, api_key):
-    url = "https://api.assemblyai.com/v2/transcript"
-
-    headers = {
-        "authorization": api_key,
-    }
-
-    files = {
-        "audio": audio_data,
-    }
-
-    response = requests.post(url, headers=headers, files=files)
-    response_data = response.json()
-
-    if response.status_code == 201:
-        transcript_id = response_data["id"]
-        return transcript_id
-    else:
-        raise Exception("Error transcribing audio.")
-
-def get_transcription(transcript_id, api_key):
-    url = f"https://api.assemblyai.com/v2/transcript/{transcript_id}"
-
-    headers = {
-        "authorization": api_key,
-    }
-
-    response = requests.get(url, headers=headers)
-    response_data = response.json()
-
-    if response.status_code == 200:
-        transcript_status = response_data["status"]
-        if transcript_status == "completed":
-            transcript_text = response_data["text"]
-            return transcript_text
-        elif transcript_status == "queued" or transcript_status == "processing":
-            return None
-    else:
-        raise Exception("Error retrieving transcription.")
+def transcribe_audio(audio_data):
+    asr_pipeline = pipeline("automatic-speech-recognition", model="facebook/wav2vec2-large-xlsr-53")
+    transcriptions = asr_pipeline(audio_data)
+    transcribed_text = transcriptions[0]["text"]
+    return transcribed_text
 
 def run_chatbot():    
     default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:"
@@ -85,14 +51,10 @@ def run_chatbot():
 
     if user_audio:
         try:
-            assemblyai_api_key = "0b0a5dff3d4a4893af85204dc660f88b"
-            transcript_id = transcribe_audio(user_audio.read(), assemblyai_api_key)
-            transcript_text = None
+            audio_data = user_audio.read()
+            transcribed_text = transcribe_audio(audio_data)
 
-            while transcript_text is None:
-                transcript_text = get_transcription(transcript_id, assemblyai_api_key)
-
-            hindi_text = Transliterator(source='eng', target='hin').transform(transcript_text)
+            hindi_text = Transliterator(source='eng', target='hin').transform(transcribed_text)
             english_text = Translator().translate(hindi_text, dest='en').text
             prompt = default_prompt + "\nYou: " + english_text      
             response = chatbot_response(prompt)
