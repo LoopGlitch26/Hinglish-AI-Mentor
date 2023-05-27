@@ -5,7 +5,9 @@ import openai
 from gtts import gTTS
 from io import BytesIO
 import assemblyai
-from streamlit_audio_recorder import st_audio_recorder
+import numpy as np
+import sounddevice as sd
+import webrtc_audio_processor as webrtc
 
 openai.api_key = st.secrets["openai_api_key"]
 
@@ -31,7 +33,6 @@ def text_to_speech(text):
 def run_chatbot():    
     default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:"
     user_input = st.text_input("Enter your query in Hinglish:")
-    user_audio = st_audio_recorder(start_recording=False, format="WAV")
 
     if user_input:
         try:
@@ -44,22 +45,29 @@ def run_chatbot():
         except Exception as e:
             st.error("Error: " + str(e))
 
-    if user_audio:
-        try:
-            assemblyai.settings.api_key = "0b0a5dff3d4a4893af85204dc660f88b"
-            transcriber = assemblyai.Transcriber()
-            audio_data = user_audio.getvalue()
-            transcript = transcriber.transcribe(audio_data)
-            transcribed_text = transcript.text
+    audio_config = webrtc.AudioProcessorConfig(sample_rate=16000, sample_size=16, channel_layout=1)
+    audio_processor = webrtc.AudioProcessor(config=audio_config, use_gpu=False)
 
-            hindi_text = Transliterator(source='eng', target='hin').transform(transcribed_text)
-            english_text = Translator().translate(hindi_text, dest='en').text
-            prompt = default_prompt + "\nYou: " + english_text      
-            response = chatbot_response(prompt)
-            st.success(f"Chatbot: {response}")
-            st.audio(text_to_speech(response), format="audio/wav")
-        except Exception as e:
-            st.error("Error: " + str(e))
+    if st.button("Start Recording"):
+        with audio_processor.record(output_dtype=np.float32):
+            st.info("Recording...")
+
+        audio_data = audio_processor.get_data()
+        if len(audio_data) > 0:
+            try:
+                assemblyai.settings.api_key = "0b0a5dff3d4a4893af85204dc660f88b"
+                transcriber = assemblyai.Transcriber()
+                transcript = transcriber.transcribe(audio_data.tobytes())
+                transcribed_text = transcript.text
+
+                hindi_text = Transliterator(source='eng', target='hin').transform(transcribed_text)
+                english_text = Translator().translate(hindi_text, dest='en').text
+                prompt = default_prompt + "\nYou: " + english_text      
+                response = chatbot_response(prompt)
+                st.success(f"Chatbot: {response}")
+                st.audio(text_to_speech(response), format="audio/wav")
+            except Exception as e:
+                st.error("Error: " + str(e))
 
 if __name__ == "__main__":
     st.set_page_config(page_title="Hinglish Chatbot")
