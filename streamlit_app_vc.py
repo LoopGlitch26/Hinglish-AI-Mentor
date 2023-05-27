@@ -45,8 +45,7 @@ def run_chatbot():
 
     if user_audio:
         try:
-            assemblyai.settings.api_key = "0b0a5dff3d4a4893af85204dc660f88b"
-            transcriber = assemblyai.Transcriber()
+            transcriber = assemblyai.Transcriber(api_key="0b0a5dff3d4a4893af85204dc660f88b")
             audio_data = user_audio.read()
             transcript = transcriber.transcribe(audio_data)
             transcribed_text = transcript.text
