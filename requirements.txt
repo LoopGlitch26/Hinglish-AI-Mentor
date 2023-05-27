@@ -22,4 +22,3 @@ google-cloud-speech
 streamlit-chat
 playsound
 assemblyai
-git+https://github.com/AI4Bharat/IndicTrans2
