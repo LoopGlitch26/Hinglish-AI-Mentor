@@ -1,5 +1,5 @@
 import streamlit as st
-import assemblyai as aai
+import azure.cognitiveservices.speech as speechsdk
 from googletrans import Translator
 from indictrans import Transliterator
 import openai
@@ -7,7 +7,8 @@ from gtts import gTTS
 from io import BytesIO
 
 openai.api_key = st.secrets["openai_api_key"]
-aai.settings.api_key = st.secrets["assemblyai_api_key"]
+azure_speech_key = st.secrets["azure_key"]
+azure_speech_region = st.secrets["azure_region"]
 
 def chatbot_response(prompt):
     completions = openai.Completion.create(
@@ -29,9 +30,11 @@ def text_to_speech(text):
     return audio_bytes.read()
 
 def transcribe_audio(audio_file):
-    transcriber = aai.Transcriber()
-    transcript = transcriber.transcribe(audio_file)
-    return transcript.text
+    speech_config = speechsdk.SpeechConfig(subscription=azure_speech_key, region=azure_speech_region)
+    audio_config = speechsdk.AudioConfig(filename=audio_file)
+    speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
+    result = speech_recognizer.recognize_once_async().get()
+    return result.text if result.reason == speechsdk.ResultReason.RecognizedSpeech else ""
 
 def run_chatbot():    
     default_prompt = "Answer in details in Hinglish language. Aap ek Microentreprenuer ke Mentor hai. Microentreprenuer ka sawaal:"
